@@ -177,17 +177,17 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
     {
       label: 'Botella PET de Agua',
       categoria: 'Plástico PET',
-      image: '/src/assets/images/smart_deposit_bin_1794427469235.jpg',
+      image: '/images/smart_deposit_bin_1794427469235.jpg',
     },
     {
       label: 'Caja de Cartón Plegable',
       categoria: 'Cartón y Papel',
-      image: '/src/assets/images/circular_goods_1794427468847.jpg',
+      image: '/images/circular_goods_1794427468847.jpg',
     },
     {
       label: 'Lata Aluminio Bebida',
       categoria: 'Aluminio / Latas',
-      image: '/src/assets/images/clean_point_center_1794427468143.jpg',
+      image: '/images/clean_point_center_1794427468143.jpg',
     },
   ];
 

@@ -50,7 +50,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="relative rounded-[20px] overflow-hidden min-h-[520px] sm:min-h-[580px] flex flex-col justify-between p-6 sm:p-12 text-center">
           {/* Nature Photo Backdrop */}
           <img
-            src="/src/assets/images/eco_hub_hero_1794427467724.jpg"
+            src="/images/eco_hub_hero_1794427467724.jpg"
             alt="Follaje verde natural de bosque"
             referrerPolicy="no-referrer"
             className="absolute inset-0 w-full h-full object-cover object-center"
@@ -166,7 +166,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div>
                 <div className="rounded-[20px] overflow-hidden aspect-[4/3] mb-4 bg-[#ffffff]">
                   <img
-                    src="/src/assets/images/clean_point_center_1794427468143.jpg"
+                    src="/images/clean_point_center_1794427468143.jpg"
                     alt="Centro de clasificación asistido por IA"
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -197,7 +197,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div>
                 <div className="rounded-[20px] overflow-hidden aspect-[4/3] mb-4 bg-[#ffffff]">
                   <img
-                    src="/src/assets/images/smart_deposit_bin_1794427469235.jpg"
+                    src="/images/smart_deposit_bin_1794427469235.jpg"
                     alt="Contenedor inteligente de depósito"
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -228,7 +228,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div>
                 <div className="rounded-[20px] overflow-hidden aspect-[4/3] mb-4 bg-[#ffffff]">
                   <img
-                    src="/src/assets/images/circular_goods_1794427468847.jpg"
+                    src="/images/circular_goods_1794427468847.jpg"
                     alt="Recompensas y marcas circulares"
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -259,7 +259,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <div>
                 <div className="rounded-[20px] overflow-hidden aspect-[4/3] mb-4 bg-[#ffffff]">
                   <img
-                    src="/src/assets/images/eco_hub_hero_1794427467724.jpg"
+                    src="/images/eco_hub_hero_1794427467724.jpg"
                     alt="Impacto ambiental y cadena de custodia"
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -482,7 +482,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
               <div className="rounded-[20px] overflow-hidden mb-5 bg-[#ffffff]">
                 <img
-                  src="/src/assets/images/circular_goods_1794427468847.jpg"
+                  src="/images/circular_goods_1794427468847.jpg"
                   alt="Productos de economía circular"
                   referrerPolicy="no-referrer"
                   className="w-full h-36 object-cover"
