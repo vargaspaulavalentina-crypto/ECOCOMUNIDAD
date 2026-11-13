@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="01-create-roles" author="ecocommunity">
+        <createTable tableName="roles">
+            <column name="id_rol" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nombre" type="VARCHAR(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="descripcion" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="02-create-usuarios" author="ecocommunity">
+        <createTable tableName="usuarios">
+            <column name="id_usuario" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_rol" type="INT">
+                <constraints nullable="false" foreignKeyName="fk_usr_rol" references="roles(id_rol)"/>
+            </column>
+            <column name="nombre" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(150)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password_hash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="avatar_url" type="VARCHAR(500)"/>
+            <column name="entidad" type="VARCHAR(150)"/>
+            <column name="estado" type="VARCHAR(20)" defaultValue="activo"/>
+            <column name="fecha_registro" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="03-create-materiales" author="ecocommunity">
+        <createTable tableName="materiales">
+            <column name="id_material" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="codigo_barras" type="VARCHAR(50)">
+                <constraints unique="true"/>
+            </column>
+            <column name="nombre" type="VARCHAR(150)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="categoria" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="puntos_por_kg" type="INT" defaultValueNumeric="100"/>
+            <column name="co2_factor" type="DECIMAL(5,2)" defaultValueNumeric="1.00"/>
+            <column name="instrucciones_reciclaje" type="TEXT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="04-create-puntos-limpios" author="ecocommunity">
+        <createTable tableName="puntos_limpios">
+            <column name="id_punto" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nombre" type="VARCHAR(150)"><constraints nullable="false"/></column>
+            <column name="direccion" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="latitud" type="DECIMAL(10,8)"><constraints nullable="false"/></column>
+            <column name="longitud" type="DECIMAL(11,8)"><constraints nullable="false"/></column>
+            <column name="horario" type="VARCHAR(100)"><constraints nullable="false"/></column>
+            <column name="capacidad_max_kg" type="DECIMAL(10,2)" defaultValueNumeric="1000.00"/>
+            <column name="capacidad_actual_kg" type="DECIMAL(10,2)" defaultValueNumeric="0.00"/>
+            <column name="activo" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="codigo_qr_hash" type="VARCHAR(100)"><constraints unique="true" nullable="false"/></column>
+            <column name="tipo" type="VARCHAR(50)" defaultValue="Contenedor Inteligente"/>
+            <column name="materiales_aceptados" type="TEXT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="05-create-entregas" author="ecocommunity">
+        <createTable tableName="entregas">
+            <column name="id_entrega" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(64)"><constraints unique="true" nullable="false"/></column>
+            <column name="usuario_id" type="INT"><constraints nullable="false" foreignKeyName="fk_ent_usr" references="usuarios(id_usuario)"/></column>
+            <column name="punto_id" type="INT"><constraints nullable="false" foreignKeyName="fk_ent_punto" references="puntos_limpios(id_punto)"/></column>
+            <column name="material_nombre" type="VARCHAR(150)"><constraints nullable="false"/></column>
+            <column name="categoria" type="VARCHAR(50)"><constraints nullable="false"/></column>
+            <column name="peso_kg" type="DECIMAL(8,3)"><constraints nullable="false"/></column>
+            <column name="puntos_otorgados" type="INT"><constraints nullable="false"/></column>
+            <column name="co2_ahorrado_kg" type="DECIMAL(8,3)"><constraints nullable="false"/></column>
+            <column name="estado" type="VARCHAR(30)" defaultValue="confirmada"/>
+            <column name="latitud_registro" type="DECIMAL(10,8)"><constraints nullable="false"/></column>
+            <column name="longitud_registro" type="DECIMAL(11,8)"><constraints nullable="false"/></column>
+            <column name="distancia_metros" type="INT"><constraints nullable="false"/></column>
+            <column name="qr_hash" type="VARCHAR(100)"><constraints nullable="false"/></column>
+            <column name="fecha_entrega" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="cadena_custodia_paso" type="VARCHAR(30)" defaultValue="depositado"/>
+            <column name="recibo_digital_hash" type="VARCHAR(64)"><constraints unique="true" nullable="false"/></column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
+

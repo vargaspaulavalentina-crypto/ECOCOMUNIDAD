@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserRole, UserProfile } from '../types';
-import { Leaf, LogOut, Shield, User, Truck, Building2, Award } from 'lucide-react';
+import { Leaf, LogOut, Shield, User, Truck, Building2, Award, History, Database } from 'lucide-react';
 
 interface NavbarProps {
   currentUser: UserProfile | null;
@@ -8,6 +8,7 @@ interface NavbarProps {
   onLogout: () => void;
   onNavigateHome: () => void;
   onOpenRoleSwitcher: () => void;
+  onOpenHistorico?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -16,6 +17,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
   onNavigateHome,
   onOpenRoleSwitcher,
+  onOpenHistorico,
 }) => {
   const getRoleLabel = (role: UserRole) => {
     switch (role) {
@@ -66,8 +68,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>ECOCOMMUNITY</span>
           </button>
 
-          {/* Right Action: ONLY "Escanear Residuo" as requested, plus user auth status */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Right Action: Escanear Residuo, Histórico MySQL, plus user auth status */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            {onOpenHistorico && (
+              <button
+                onClick={onOpenHistorico}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f0f0eb] hover:bg-[#e4e4dd] text-xs font-semibold text-[#333333] transition-colors border border-[#bebeb9]/30"
+                title="Abrir Histórico interactivo sincronizado con MySQL en XAMPP"
+              >
+                <Database className="w-3.5 h-3.5 text-emerald-700" />
+                <span className="hidden sm:inline">Histórico BD</span>
+              </button>
+            )}
+
             {currentUser ? (
               <>
                 {/* Active Role Portal Badge (Pill with quick switch) */}

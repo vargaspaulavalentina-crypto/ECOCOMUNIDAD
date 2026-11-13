@@ -12,6 +12,7 @@ import { DashboardView } from './components/DashboardView';
 import { DigitalReceiptModal } from './components/DigitalReceiptModal';
 import { RoleSwitcherModal } from './components/RoleSwitcherModal';
 import { AuthModal } from './components/AuthModal';
+import { HistoricoModal } from './components/HistoricoModal';
 import { SiteLoadingSkeleton } from './components/SkeletonLoader';
 
 // Dedicated Private Web Portals for each role
@@ -33,6 +34,7 @@ export default function App() {
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [roleModalOpen, setRoleModalOpen] = useState(false);
+  const [historicoModalOpen, setHistoricoModalOpen] = useState(false);
   const [walletData, setWalletData] = useState<UserWalletData | null>(null);
   const [recentDeliveries, setRecentDeliveries] = useState<Entrega[]>([]);
   const [scannedMaterial, setScannedMaterial] = useState<ClassificationResult | null>(null);
@@ -230,6 +232,7 @@ export default function App() {
           }
         }}
         onOpenRoleSwitcher={() => setRoleModalOpen(true)}
+        onOpenHistorico={() => setHistoricoModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -355,6 +358,17 @@ export default function App() {
           if (!currentUser) {
             setAuthModalOpen(true);
           }
+        }}
+      />
+
+      {/* Interactive MySQL Historical & Chain of Custody Modal */}
+      <HistoricoModal
+        isOpen={historicoModalOpen}
+        onClose={() => setHistoricoModalOpen(false)}
+        onSelectReceipt={(entrega) => {
+          setActiveReceipt(entrega);
+          setActivePunto(null);
+          setReceiptModalOpen(true);
         }}
       />
 
