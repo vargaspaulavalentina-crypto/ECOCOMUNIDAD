@@ -48,7 +48,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     <div className="space-y-20 pb-20">
       {/* 1. HERO SECTION: Escena 3D Three.js — planeta sostenido por manos */}
       <LazySection>
-        <HeroThreeJS onNavigate={onNavigate} onScanClick={onScanClick} />
+        <HeroThreeJS
+          onNavigate={onNavigate}
+          onScanClick={onScanClick}
+          walletStats={{ kgTotal, saldo, co2Total }}
+        />
       </LazySection>
 
       {/* 2. VALUE PROPOSITION: 4-Column Nature Image Cards Grid */}
