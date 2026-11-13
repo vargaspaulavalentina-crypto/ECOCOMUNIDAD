@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Entrega, UserWalletData } from '../types';
 import { LazySection } from './LazySection';
+import { HeroThreeJS } from './HeroThreeJS';
 import {
   Camera,
   MapPin,
@@ -45,107 +46,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   return (
     <div className="space-y-20 pb-20">
-      {/* 1. HERO SECTION: Full-bleed leaf photography + Search clearing + Floating Dark Stats */}
+      {/* 1. HERO SECTION: Escena 3D Three.js — planeta sostenido por manos */}
       <LazySection>
-        <div className="relative rounded-[20px] overflow-hidden min-h-[520px] sm:min-h-[580px] flex flex-col justify-between p-6 sm:p-12 text-center">
-          {/* Nature Photo Backdrop */}
-          <img
-            src="/images/eco_hub_hero_1794427467724.jpg"
-            alt="Follaje verde natural de bosque"
-            referrerPolicy="no-referrer"
-            className="absolute inset-0 w-full h-full object-cover object-center"
-          />
-          {/* Subtle gradient vignette to assure contrast */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/25 to-black/60 pointer-events-none" />
-
-          {/* Centered Headline in Founders Grotesk / Inter Tight 48-54px weight 700 */}
-          <div className="relative z-10 max-w-2xl mx-auto pt-8 sm:pt-14 space-y-4">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold text-white tracking-wider uppercase">
-              <span className="w-2 h-2 rounded-full bg-[#d7eb80]" />
-              Economía Circular Comunitaria
-            </span>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-bold text-[#ffffff] tracking-[-0.03em] leading-[1.10]">
-              Recicla. Impacta. Transforma tu Entorno.
-            </h1>
-
-            <p className="text-base sm:text-lg text-[#ffffff]/90 max-w-lg mx-auto font-normal leading-relaxed">
-              La plataforma ciudadana que recompensa cada empaque reciclado con visión artificial Gemini y puntos limpios con geofence.
-            </p>
-
-            {/* Massive White Pill Search & Scan Bar */}
-            <form
-              onSubmit={handleSearchSubmit}
-              className="pt-3 max-w-xl mx-auto"
-            >
-              <div className="bg-[#ffffff] rounded-full h-14 sm:h-16 px-5 flex items-center gap-3 shadow-lg transition-shadow focus-within:ring-2 focus-within:ring-[#d7eb80]">
-                <Search className="w-5 h-5 text-[#333333] shrink-0" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Busca un residuo, botella PET o punto limpio..."
-                  className="w-full bg-transparent text-sm sm:text-base text-[#333333] placeholder-[#6c6c6c] outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={onScanClick}
-                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#333333] text-xs font-medium text-[#333333] hover:bg-[#f8f8f6] transition-colors"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#333333]" />
-                  <span>+ IA Visión</span>
-                </button>
-              </div>
-            </form>
-          </div>
-
-          {/* Floating Dark Translucent Stats Card over the Hero Photo (The single shadow token) */}
-          <div className="relative z-10 max-w-3xl mx-auto w-full pt-8">
-            <div className="hero-floating-stat p-5 sm:p-6 text-white grid grid-cols-1 sm:grid-cols-3 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-white/15">
-              <div className="flex items-center gap-3.5 justify-center sm:justify-start">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                  <TreePine className="w-5 h-5 text-[#d7eb80]" />
-                </div>
-                <div className="text-left">
-                  <div className="text-xl sm:text-2xl font-bold tabular-nums text-white leading-tight">
-                    {kgTotal} kg
-                  </div>
-                  <span className="text-[12px] text-[#d7eb80] font-medium block">
-                    Material desviado de vertedero
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3.5 justify-center sm:justify-start pt-3 sm:pt-0 sm:pl-4">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                  <Coins className="w-5 h-5 text-[#d7eb80]" />
-                </div>
-                <div className="text-left">
-                  <div className="text-xl sm:text-2xl font-bold tabular-nums text-white leading-tight">
-                    {saldo} EC
-                  </div>
-                  <span className="text-[12px] text-[#d7eb80] font-medium block">
-                    Ecocoins en tu billetera
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3.5 justify-center sm:justify-start pt-3 sm:pt-0 sm:pl-4">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                  <Leaf className="w-5 h-5 text-[#d7eb80]" />
-                </div>
-                <div className="text-left">
-                  <div className="text-xl sm:text-2xl font-bold tabular-nums text-white leading-tight">
-                    {co2Total} kg
-                  </div>
-                  <span className="text-[12px] text-[#d7eb80] font-medium block">
-                    Huella de CO2 compensada
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <HeroThreeJS onNavigate={onNavigate} onScanClick={onScanClick} />
       </LazySection>
 
       {/* 2. VALUE PROPOSITION: 4-Column Nature Image Cards Grid */}
