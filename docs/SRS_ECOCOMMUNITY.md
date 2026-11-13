@@ -770,3 +770,4 @@ A partir de la aprobación de esta versión del documento:
 - Las especificaciones de los **Requerimientos Funcionales (RF-001 al RF-018)** y **No Funcionales (RNF-001 al RNF-010)** aquí detalladas constituyen el marco contractual de desarrollo y pruebas.
 - El modelo conceptual (Sección 5) y los contratos de API definidos en la Sección 3 prevalecerán ante cualquier divergencia de diseño o maquetación previa.
 - Todos los diagramas de secuencia, casos de uso expandidos, scripts de base de datos DDL y casos de prueba de QA que elabore el equipo deberán tomar como base los códigos y reglas de negocio descritos en este documento.
+
