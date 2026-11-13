@@ -1,18 +1,17 @@
 /**
- * HeroThreeJS.tsx — Hero 3D de Alta Definición para EcoCommunity
+ * HeroThreeJS.tsx — Interfaz Corporativa y Futurista de Economía Circular (16:9)
  *
- * Características del modelado 3D:
- * 1. Planeta Tierra PBR de alta resolución (texturas procedurales 2048x1024 generadas en memoria
- *    para carga instantánea 100% offline/online sin fallos de red):
- *    - Continentes reales (América, Europa, África, Asia, Oceanía, Antártida) con biomas detallados
- *    - Mapa topográfico de relieve (bumpMap) y mapa de reflectividad oceánica (roughnessMap)
- *    - Red luminosa de nodos ecológicos y arcos orbitales 3D conectados en tiempo real
- *    - Capa dinámica de nubes volumétricas y atmósfera con shader Fresnel
- * 2. Dos manos esculturales anatómicas de alto detalle:
- *    - Palma orgánica modelada con arco metacarpiano, eminencia tenar (base del pulgar) y muñeca
- *    - 5 dedos articulados por mano con 3 falanges cada uno (proximal, media, distal),
- *      articulaciones suavizadas y puntas anatómicas curvadas acunando el planeta
- *    - Movimiento orgánico de respiración y micro-articulación individual en los dedos
+ * Combina:
+ * - Izquierda: Jerarquía tipográfica editorial, CTAs de alto contraste, tarjetas
+ *   Glassmorphism de métricas en tiempo real y barra técnica de MÓDULOS.
+ * - Derecha: Composición hiperrealista del planeta Tierra acunado por dos manos humanas
+ *   integrada con un motor WebGL Three.js en tiempo real que anima:
+ *     1. Rotación continua de la capa de nubes volumétricas, nodos de geolocalización
+ *        y brillo atmosférico Fresnel sobre la esfera del planeta.
+ *     2. Múltiples anillos y órbitas holográficas 3D en verde vibrante con pulsos de
+ *        datos digitales fluyendo en tiempo real.
+ *     3. Red de constelaciones/nodos laterales y partículas de luz verde y ámbar/dorado
+ *        con profundidad de campo y respuesta interactiva al cursor (parallax 3D).
  */
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -20,9 +19,7 @@ import * as THREE from 'three';
 import {
   Sparkles,
   ArrowRight,
-  ScanLine,
   MapPin,
-  ShieldCheck,
   Coins,
   TreePine,
   Leaf,
@@ -38,7 +35,6 @@ interface HeroThreeJSProps {
   };
 }
 
-// ─── DETECCIÓN DE WEBGL ─────────────────────────────────────────────────────
 function isWebGLAvailable(): boolean {
   try {
     const canvas = document.createElement('canvas');
@@ -53,546 +49,75 @@ function isWebGLAvailable(): boolean {
   }
 }
 
-// ─── GENERADOR DE RUIDO FRACTAL DETERMINISTA (PARA BIOMAS, RELIEVE Y NUBES) ──
-function hash2D(x: number, y: number): number {
-  const h = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
-  return h - Math.floor(h);
-}
-
-function smoothNoise(x: number, y: number): number {
-  const ix = Math.floor(x);
-  const iy = Math.floor(y);
-  const fx = x - ix;
-  const fy = y - iy;
-  const ux = fx * fx * (3 - 2 * fx);
-  const uy = fy * fy * (3 - 2 * fy);
-
-  const a = hash2D(ix, iy);
-  const b = hash2D(ix + 1, iy);
-  const c = hash2D(ix, iy + 1);
-  const d = hash2D(ix + 1, iy + 1);
-
-  return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
-}
-
-function fbm(x: number, y: number, octaves = 4): number {
-  let value = 0;
-  let amplitude = 0.5;
-  let frequency = 1;
-  for (let i = 0; i < octaves; i++) {
-    value += amplitude * smoothNoise(x * frequency, y * frequency);
-    frequency *= 2.05;
-    amplitude *= 0.5;
-  }
-  return value;
-}
-
-// ─── POLÍGONOS CONTINENTALES (COORDENADAS NORMALIZADAS UV 0..1) ─────────────
-// Permiten dibujar continentes reconocibles combinados con ruido fractal en las costas
-const CONTINENT_BLOBS: Array<{
-  cx: number;
-  cy: number;
-  rx: number;
-  ry: number;
-  rot?: number;
-  weight?: number;
-}> = [
-  // Norteamérica
-  { cx: 0.21, cy: 0.27, rx: 0.095, ry: 0.09, rot: -0.25, weight: 1.1 },
-  { cx: 0.16, cy: 0.21, rx: 0.06, ry: 0.045, rot: 0.1, weight: 0.9 },
-  { cx: 0.25, cy: 0.36, rx: 0.032, ry: 0.05, rot: -0.4, weight: 0.85 },
-  // Centroamérica y Caribe
-  { cx: 0.265, cy: 0.43, rx: 0.018, ry: 0.035, rot: -0.5, weight: 0.8 },
-  // Sudamérica
-  { cx: 0.315, cy: 0.56, rx: 0.055, ry: 0.095, rot: -0.15, weight: 1.15 },
-  { cx: 0.305, cy: 0.69, rx: 0.028, ry: 0.085, rot: 0.1, weight: 1.0 },
-  // Groenlandia
-  { cx: 0.365, cy: 0.14, rx: 0.042, ry: 0.035, rot: 0.2, weight: 0.95 },
-  // Europa
-  { cx: 0.515, cy: 0.24, rx: 0.065, ry: 0.055, rot: -0.1, weight: 1.0 },
-  { cx: 0.48, cy: 0.29, rx: 0.035, ry: 0.035, rot: 0.2, weight: 0.85 },
-  { cx: 0.525, cy: 0.17, rx: 0.028, ry: 0.045, rot: 0.3, weight: 0.85 },
-  // África
-  { cx: 0.535, cy: 0.45, rx: 0.075, ry: 0.09, rot: -0.1, weight: 1.2 },
-  { cx: 0.565, cy: 0.61, rx: 0.045, ry: 0.095, rot: 0.05, weight: 1.1 },
-  { cx: 0.625, cy: 0.64, rx: 0.012, ry: 0.03, rot: 0.2, weight: 0.75 }, // Madagascar
-  // Asia
-  { cx: 0.68, cy: 0.26, rx: 0.14, ry: 0.095, rot: 0.08, weight: 1.25 },
-  { cx: 0.77, cy: 0.34, rx: 0.085, ry: 0.075, rot: -0.2, weight: 1.1 },
-  { cx: 0.63, cy: 0.38, rx: 0.045, ry: 0.05, rot: 0.3, weight: 0.95 }, // Medio Oriente
-  { cx: 0.705, cy: 0.42, rx: 0.032, ry: 0.055, rot: 0.0, weight: 0.95 }, // India
-  { cx: 0.785, cy: 0.45, rx: 0.028, ry: 0.05, rot: -0.3, weight: 0.85 }, // Sudeste Asiático
-  { cx: 0.855, cy: 0.32, rx: 0.014, ry: 0.04, rot: 0.35, weight: 0.8 }, // Japón
-  // Indonesia / Filipinas
-  { cx: 0.81, cy: 0.52, rx: 0.045, ry: 0.025, rot: 0.15, weight: 0.78 },
-  // Australia y Nueva Zelanda
-  { cx: 0.84, cy: 0.67, rx: 0.058, ry: 0.052, rot: -0.1, weight: 1.05 },
-  { cx: 0.925, cy: 0.75, rx: 0.012, ry: 0.028, rot: 0.4, weight: 0.75 },
-  // Antártida
-  { cx: 0.5, cy: 0.95, rx: 0.45, ry: 0.045, rot: 0, weight: 1.1 },
-];
-
-function evaluateContinentMask(u: number, v: number): number {
-  let maxVal = 0;
-  for (let i = 0; i < CONTINENT_BLOBS.length; i++) {
-    const b = CONTINENT_BLOBS[i];
-    const dx = u - b.cx;
-    const dy = v - b.cy;
-    const cosR = Math.cos(b.rot || 0);
-    const sinR = Math.sin(b.rot || 0);
-    const rx = (dx * cosR - dy * sinR) / b.rx;
-    const ry = (dx * sinR + dy * cosR) / b.ry;
-    const distSq = rx * rx + ry * ry;
-    if (distSq < 2.2) {
-      const falloff = Math.max(0, 1 - distSq) * (b.weight || 1);
-      if (falloff > maxVal) maxVal = falloff;
-    }
-  }
-  const detail = fbm(u * 22, v * 11, 5);
-  const fine = fbm(u * 55 + 10, v * 28 + 5, 3);
-  return maxVal * 0.82 + (detail - 0.42) * 0.58 + (fine - 0.5) * 0.22;
-}
-
-// ─── GENERADOR DE TEXTURAS PBR DEL PLANETA TIERRA ───────────────────────────
-function createEarthTextures() {
+// Generador de textura procedural de nubes y destellos continentales para la esfera 3D superpuesta
+function createDynamicCloudAndNodeTexture(): THREE.CanvasTexture {
   const width = 1024;
   const height = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d')!;
 
-  const colorCanvas = document.createElement('canvas');
-  colorCanvas.width = width;
-  colorCanvas.height = height;
-  const colorCtx = colorCanvas.getContext('2d')!;
+  ctx.clearRect(0, 0, width, height);
 
-  const bumpCanvas = document.createElement('canvas');
-  bumpCanvas.width = width;
-  bumpCanvas.height = height;
-  const bumpCtx = bumpCanvas.getContext('2d')!;
+  // Bandas suaves de sistemas nubosos translúcidos
+  for (let i = 0; i < 180; i++) {
+    const x = Math.random() * width;
+    const y = 60 + Math.random() * (height - 120);
+    const rx = 25 + Math.random() * 95;
+    const ry = 8 + Math.random() * 28;
 
-  const roughCanvas = document.createElement('canvas');
-  roughCanvas.width = width;
-  roughCanvas.height = height;
-  const roughCtx = roughCanvas.getContext('2d')!;
+    const grad = ctx.createRadialGradient(x, y, 1, x, y, rx);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.22)');
+    grad.addColorStop(0.5, 'rgba(220, 252, 231, 0.09)');
+    grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
-  const cloudCanvas = document.createElement('canvas');
-  cloudCanvas.width = width;
-  cloudCanvas.height = height;
-  const cloudCtx = cloudCanvas.getContext('2d')!;
-
-  const colorImg = colorCtx.createImageData(width, height);
-  const bumpImg = bumpCtx.createImageData(width, height);
-  const roughImg = roughCtx.createImageData(width, height);
-  const cloudImg = cloudCtx.createImageData(width, height);
-
-  const cData = colorImg.data;
-  const bData = bumpImg.data;
-  const rData = roughImg.data;
-  const clData = cloudImg.data;
-
-  for (let y = 0; y < height; y++) {
-    const v = y / height;
-    const lat = Math.abs(v - 0.5) * 2; // 0 en ecuador, 1 en polos
-
-    for (let x = 0; x < width; x++) {
-      const u = x / width;
-      const idx = (y * width + x) * 4;
-
-      const elevation = evaluateContinentMask(u, v);
-      const moisture = fbm(u * 16 + 31.7, v * 8 + 12.3, 4);
-      const mountainNoise = fbm(u * 45 + 7.1, v * 24 + 19.4, 4);
-
-      // 1. Color + Bump + Roughness
-      if (elevation > 0.34) {
-        // TIERRA FIRME
-        const normH = Math.min(1, (elevation - 0.34) / 0.55);
-        const ridge = Math.pow(mountainNoise, 1.8) * normH;
-
-        let r = 34;
-        let g = 128;
-        let b = 58;
-
-        if (lat > 0.82 || ridge > 0.52) {
-          // Nieve polar o cumbres andinas/alpinas
-          const snowMix = Math.min(1, Math.max((lat - 0.82) * 6, (ridge - 0.52) * 3.5));
-          r = Math.round(38 + snowMix * 205);
-          g = Math.round(115 + snowMix * 132);
-          b = Math.round(62 + snowMix * 185);
-        } else if (moisture < 0.43 && lat > 0.14 && lat < 0.58) {
-          // Sabana / meseta cálida / relieve árido
-          const dry = (0.43 - moisture) * 2.8;
-          r = Math.round(45 + dry * 125 + ridge * 45);
-          g = Math.round(135 + dry * 45 + ridge * 25);
-          b = Math.round(58 + dry * 22);
-        } else {
-          // Bosques tropicales y templados (paleta EcoCommunity)
-          const lush = Math.min(1, moisture * 1.35);
-          r = Math.round(22 + (1 - lush) * 38 + ridge * 55);
-          g = Math.round(98 + lush * 68 + normH * 28);
-          b = Math.round(42 + lush * 24);
-        }
-
-        // Borde costero suave iluminado
-        if (elevation < 0.375) {
-          r = Math.min(255, r + 24);
-          g = Math.min(255, g + 32);
-          b = Math.min(255, b + 18);
-        }
-
-        cData[idx] = r;
-        cData[idx + 1] = g;
-        cData[idx + 2] = b;
-        cData[idx + 3] = 255;
-
-        const bumpVal = Math.min(255, Math.round(128 + normH * 85 + ridge * 65));
-        bData[idx] = bData[idx + 1] = bData[idx + 2] = bumpVal;
-        bData[idx + 3] = 255;
-
-        // Tierra mate (alta rugosidad)
-        rData[idx] = rData[idx + 1] = rData[idx + 2] = 215;
-        rData[idx + 3] = 255;
-      } else {
-        // OCÉANO CON BATIMETRÍA
-        const depth = Math.max(0, Math.min(1, (0.34 - elevation) / 0.34));
-        const shallow = Math.pow(1 - depth, 2.6);
-
-        // Casquete polar ártico/antártico marino
-        const iceFactor = lat > 0.88 ? Math.min(1, (lat - 0.88) * 8.5) : 0;
-
-        const r = Math.round((8 + shallow * 22) * (1 - iceFactor) + 225 * iceFactor);
-        const g = Math.round((34 + shallow * 88) * (1 - iceFactor) + 240 * iceFactor);
-        const b = Math.round((64 + shallow * 95) * (1 - iceFactor) + 250 * iceFactor);
-
-        cData[idx] = r;
-        cData[idx + 1] = g;
-        cData[idx + 2] = b;
-        cData[idx + 3] = 255;
-
-        bData[idx] = bData[idx + 1] = bData[idx + 2] = 110;
-        bData[idx + 3] = 255;
-
-        // Agua especular brillante (baja rugosidad)
-        const roughVal = iceFactor > 0.2 ? 190 : 52;
-        rData[idx] = rData[idx + 1] = rData[idx + 2] = roughVal;
-        rData[idx + 3] = 255;
-      }
-
-      // 2. Capa de Nubes Dinámicas (remolinos atmosféricos)
-      const swirl = fbm(u * 12 + Math.sin(v * Math.PI * 3) * 0.25, v * 9, 5);
-      const cloudDensity = Math.max(0, (swirl - 0.5) * 2.55);
-      const cloudAlpha = Math.min(255, Math.round(Math.pow(cloudDensity, 1.35) * 235));
-      clData[idx] = 246;
-      clData[idx + 1] = 252;
-      clData[idx + 2] = 248;
-      clData[idx + 3] = cloudAlpha;
-    }
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(1, ry / rx);
+    ctx.beginPath();
+    ctx.arc(0, 0, rx, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.restore();
   }
 
-  colorCtx.putImageData(colorImg, 0, 0);
-  bumpCtx.putImageData(bumpImg, 0, 0);
-  roughCtx.putImageData(roughImg, 0, 0);
-  cloudCtx.putImageData(cloudImg, 0, 0);
+  // Pequeños nodos luminosos de actividad ecológica sobre los continentes
+  for (let i = 0; i < 95; i++) {
+    const x = Math.random() * width;
+    const y = 75 + Math.random() * (height - 150);
+    const r = 1.5 + Math.random() * 3.5;
 
-  const colorTex = new THREE.CanvasTexture(colorCanvas);
-  colorTex.colorSpace = THREE.SRGBColorSpace;
-  colorTex.wrapS = THREE.RepeatWrapping;
-  colorTex.wrapT = THREE.ClampToEdgeWrapping;
-  colorTex.anisotropy = 4;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r * 3.5);
+    g.addColorStop(0, 'rgba(215, 235, 128, 0.95)');
+    g.addColorStop(0.4, 'rgba(74, 222, 128, 0.45)');
+    g.addColorStop(1, 'rgba(74, 222, 128, 0)');
 
-  const bumpTex = new THREE.CanvasTexture(bumpCanvas);
-  bumpTex.wrapS = THREE.RepeatWrapping;
-  bumpTex.wrapT = THREE.ClampToEdgeWrapping;
-
-  const roughTex = new THREE.CanvasTexture(roughCanvas);
-  roughTex.wrapS = THREE.RepeatWrapping;
-  roughTex.wrapT = THREE.ClampToEdgeWrapping;
-
-  const cloudTex = new THREE.CanvasTexture(cloudCanvas);
-  cloudTex.wrapS = THREE.RepeatWrapping;
-  cloudTex.wrapT = THREE.ClampToEdgeWrapping;
-
-  return { colorTex, bumpTex, roughTex, cloudTex };
-}
-
-// ─── MODELADOR PROCEDURAL DE MANO ESCULTURAL ANATÓMICA ─────────────────────
-interface ArticulatedHand {
-  root: THREE.Group;
-  fingers: THREE.Group[];
-  thumb: THREE.Group;
-}
-
-/**
- * Construye una mano 3D escultural de alta definición con:
- * - Antebrazo/muñeca estilizada con brazalete luminoso EcoCommunity
- * - Palma orgánica compuesta por metacarpos esculpidos, arco palmar y eminencia tenar
- * - 5 dedos articulados con 3 falanges cada uno (proximal, media, distal), nudillos,
- *   yemas redondeadas y placa ungueal (uña sutil), curvados acunando la esfera terrestre
- */
-function buildSculptedHand(
-  side: 'left' | 'right',
-  skinMaterial: THREE.MeshPhysicalMaterial,
-  accentMaterial: THREE.MeshStandardMaterial
-): ArticulatedHand {
-  const root = new THREE.Group();
-  const mirror = side === 'left' ? -1 : 1;
-
-  // Grupo interno para aplicar simetría limpia en X cuando es mano izquierda
-  const handCore = new THREE.Group();
-  handCore.scale.x = mirror;
-  root.add(handCore);
-
-  // 1. PALMA ANATÓMICA ESCULPIDA (Unión de bloques metacarpianos + eminencia tenar + talón palmar)
-  const palmGroup = new THREE.Group();
-  handCore.add(palmGroup);
-
-  // Cuerpo central de la palma (ligeramente cóncavo)
-  const palmCenterGeo = new THREE.SphereGeometry(0.34, 28, 24);
-  palmCenterGeo.scale(1.05, 0.36, 1.18);
-  const palmCenter = new THREE.Mesh(palmCenterGeo, skinMaterial);
-  palmCenter.position.set(0, 0, 0);
-  palmCenter.castShadow = true;
-  palmCenter.receiveShadow = true;
-  palmGroup.add(palmCenter);
-
-  // Arco de nudillos (puente metacarpiano superior)
-  const knuckleBridgeGeo = new THREE.CapsuleGeometry(0.11, 0.48, 12, 24);
-  knuckleBridgeGeo.rotateZ(Math.PI / 2);
-  knuckleBridgeGeo.scale(1, 0.82, 0.95);
-  const knuckleBridge = new THREE.Mesh(knuckleBridgeGeo, skinMaterial);
-  knuckleBridge.position.set(0.01, 0.03, -0.34);
-  knuckleBridge.castShadow = true;
-  palmGroup.add(knuckleBridge);
-
-  // Eminencia tenar (músculo base del pulgar)
-  const thenarGeo = new THREE.SphereGeometry(0.19, 22, 18);
-  thenarGeo.scale(0.95, 0.68, 1.45);
-  const thenar = new THREE.Mesh(thenarGeo, skinMaterial);
-  thenar.position.set(-0.22, 0.04, 0.06);
-  thenar.rotation.set(0.18, 0.42, -0.2);
-  thenar.castShadow = true;
-  palmGroup.add(thenar);
-
-  // Eminencia hipotenar (borde exterior de la palma)
-  const hypothenarGeo = new THREE.SphereGeometry(0.16, 20, 18);
-  hypothenarGeo.scale(0.75, 0.62, 1.65);
-  const hypothenar = new THREE.Mesh(hypothenarGeo, skinMaterial);
-  hypothenar.position.set(0.24, 0.03, 0.04);
-  hypothenar.rotation.set(0.12, -0.15, 0.15);
-  hypothenar.castShadow = true;
-  palmGroup.add(hypothenar);
-
-  // 2. MUÑECA Y ANTEBRAZO ESCULTURAL + ANILLO LUMINOSO
-  const wristGeo = new THREE.CylinderGeometry(0.22, 0.19, 0.42, 28, 8);
-  wristGeo.scale(1.12, 1, 0.78);
-  const wrist = new THREE.Mesh(wristGeo, skinMaterial);
-  wrist.position.set(0, -0.14, 0.46);
-  wrist.rotation.x = Math.PI * 0.36;
-  wrist.castShadow = true;
-  palmGroup.add(wrist);
-
-  // Brazalete/anillo tecnológico de acento en la muñeca
-  const cuffGeo = new THREE.TorusGeometry(0.215, 0.018, 14, 36);
-  cuffGeo.scale(1.12, 0.8, 1);
-  const cuff = new THREE.Mesh(cuffGeo, accentMaterial);
-  cuff.position.set(0, -0.1, 0.39);
-  cuff.rotation.x = Math.PI * 0.86;
-  palmGroup.add(cuff);
-
-  // 3. DEDOS ARTICULADOS (ÍNDICE, MEDIO, ANULAR, MEÑIQUE)
-  // Cada dedo tiene 3 falanges ahusadas + nudillos esféricos + uña escultural
-  const fingerSpecs = [
-    {
-      name: 'index',
-      x: -0.24,
-      y: 0.04,
-      z: -0.35,
-      splayY: 0.16,
-      rollZ: -0.08,
-      lengths: [0.25, 0.17, 0.13],
-      radii: [0.068, 0.058, 0.048, 0.039],
-      curls: [0.52, 0.48, 0.36],
-    },
-    {
-      name: 'middle',
-      x: -0.075,
-      y: 0.05,
-      z: -0.38,
-      splayY: 0.04,
-      rollZ: -0.02,
-      lengths: [0.28, 0.19, 0.14],
-      radii: [0.072, 0.061, 0.05, 0.041],
-      curls: [0.56, 0.52, 0.38],
-    },
-    {
-      name: 'ring',
-      x: 0.09,
-      y: 0.04,
-      z: -0.36,
-      splayY: -0.06,
-      rollZ: 0.04,
-      lengths: [0.26, 0.175, 0.13],
-      radii: [0.067, 0.057, 0.047, 0.038],
-      curls: [0.58, 0.54, 0.4],
-    },
-    {
-      name: 'pinky',
-      x: 0.245,
-      y: 0.02,
-      z: -0.31,
-      splayY: -0.18,
-      rollZ: 0.12,
-      lengths: [0.205, 0.135, 0.11],
-      radii: [0.058, 0.049, 0.041, 0.033],
-      curls: [0.64, 0.56, 0.42],
-    },
-  ];
-
-  const fingerGroups: THREE.Group[] = [];
-
-  fingerSpecs.forEach((spec) => {
-    const fingerBase = new THREE.Group();
-    fingerBase.position.set(spec.x, spec.y, spec.z);
-    fingerBase.rotation.set(0, spec.splayY, spec.rollZ);
-    handCore.add(fingerBase);
-    fingerGroups.push(fingerBase);
-
-    let parentJoint = fingerBase;
-
-    for (let p = 0; p < 3; p++) {
-      const len = spec.lengths[p];
-      const rBase = spec.radii[p];
-      const rTop = spec.radii[p + 1];
-
-      const phalanxPivot = new THREE.Group();
-      phalanxPivot.rotation.x = spec.curls[p]; // Curvatura hacia arriba acunando el planeta
-      parentJoint.add(phalanxPivot);
-
-      // Articulación / nudillo redondeado
-      const jointGeo = new THREE.SphereGeometry(rBase * 1.02, 18, 16);
-      jointGeo.scale(1.04, 0.92, 1.0);
-      const jointMesh = new THREE.Mesh(jointGeo, skinMaterial);
-      jointMesh.castShadow = true;
-      phalanxPivot.add(jointMesh);
-
-      // Hueso/segmento carnado de la falange
-      const segGeo = new THREE.CylinderGeometry(rTop, rBase, len, 20, 4);
-      segGeo.scale(1.02, 1, 0.92);
-      const segMesh = new THREE.Mesh(segGeo, skinMaterial);
-      segMesh.position.set(0, 0, -len / 2);
-      segMesh.rotation.x = Math.PI / 2;
-      segMesh.castShadow = true;
-      segMesh.receiveShadow = true;
-      phalanxPivot.add(segMesh);
-
-      // Si es la falange distal (punta del dedo), añadir yema y uña escultural
-      if (p === 2) {
-        const tipGeo = new THREE.SphereGeometry(rTop * 0.98, 18, 16);
-        tipGeo.scale(1.0, 0.88, 1.18);
-        const tipMesh = new THREE.Mesh(tipGeo, skinMaterial);
-        tipMesh.position.set(0, 0, -len);
-        tipMesh.castShadow = true;
-        phalanxPivot.add(tipMesh);
-
-        // Placa de uña sutil en la parte dorsal
-        const nailGeo = new THREE.SphereGeometry(rTop * 0.72, 14, 12);
-        nailGeo.scale(0.95, 0.22, 1.15);
-        const nailMesh = new THREE.Mesh(nailGeo, accentMaterial);
-        nailMesh.position.set(0, -rTop * 0.72, -len * 0.82);
-        nailMesh.rotation.x = -0.12;
-        phalanxPivot.add(nailMesh);
-      }
-
-      // El siguiente segmento nace al final de la falange actual
-      const nextOrigin = new THREE.Group();
-      nextOrigin.position.set(0, 0, -len);
-      phalanxPivot.add(nextOrigin);
-      parentJoint = nextOrigin;
-    }
-  });
-
-  // 4. PULGAR ARTICULADO DE 3 SEGMENTOS (OPONIBLE, SOSTENIENDO EL FRENTE LATERAL)
-  const thumbBase = new THREE.Group();
-  thumbBase.position.set(-0.29, 0.06, -0.02);
-  thumbBase.rotation.set(0.42, 0.68, -0.45);
-  handCore.add(thumbBase);
-
-  const thumbLengths = [0.22, 0.165, 0.135];
-  const thumbRadii = [0.082, 0.068, 0.056, 0.046];
-  const thumbCurls = [0.35, 0.42, 0.34];
-
-  let thumbParent = thumbBase;
-  for (let p = 0; p < 3; p++) {
-    const len = thumbLengths[p];
-    const rBase = thumbRadii[p];
-    const rTop = thumbRadii[p + 1];
-
-    const pivot = new THREE.Group();
-    pivot.rotation.x = thumbCurls[p];
-    thumbParent.add(pivot);
-
-    const jointGeo = new THREE.SphereGeometry(rBase, 16, 14);
-    const joint = new THREE.Mesh(jointGeo, skinMaterial);
-    joint.castShadow = true;
-    pivot.add(joint);
-
-    const segGeo = new THREE.CylinderGeometry(rTop, rBase, len, 18);
-    segGeo.scale(1.05, 1, 0.92);
-    const seg = new THREE.Mesh(segGeo, skinMaterial);
-    seg.position.set(0, 0, -len / 2);
-    seg.rotation.x = Math.PI / 2;
-    seg.castShadow = true;
-    pivot.add(seg);
-
-    if (p === 2) {
-      const tipGeo = new THREE.SphereGeometry(rTop, 16, 14);
-      tipGeo.scale(1.0, 0.88, 1.15);
-      const tip = new THREE.Mesh(tipGeo, skinMaterial);
-      tip.position.set(0, 0, -len);
-      pivot.add(tip);
-    }
-
-    const next = new THREE.Group();
-    next.position.set(0, 0, -len);
-    pivot.add(next);
-    thumbParent = next;
+    ctx.beginPath();
+    ctx.arc(x, y, r * 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
   }
 
-  return { root, fingers: fingerGroups, thumb: thumbBase };
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  return tex;
 }
 
-// ─── NODOS GEOLOCALIZADOS Y ARCOS DE CONEXIÓN SOBRE LA TIERRA ───────────────
-function latLonToVector3(lat: number, lon: number, radius: number): THREE.Vector3 {
-  const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lon + 180) * (Math.PI / 180);
-  const x = -(radius * Math.sin(phi) * Math.cos(theta));
-  const z = radius * Math.sin(phi) * Math.sin(theta);
-  const y = radius * Math.cos(phi);
-  return new THREE.Vector3(x, y, z);
-}
-
-const ECO_NODES = [
-  { name: 'Bogotá', lat: 4.71, lon: -74.07 },
-  { name: 'Medellín', lat: 6.24, lon: -75.58 },
-  { name: 'São Paulo', lat: -23.55, lon: -46.63 },
-  { name: 'Ciudad de México', lat: 19.43, lon: -99.13 },
-  { name: 'Nueva York', lat: 40.71, lon: -74.0 },
-  { name: 'Madrid', lat: 40.41, lon: -3.7 },
-  { name: 'Berlín', lat: 52.52, lon: 13.4 },
-  { name: 'Nairobi', lat: -1.29, lon: 36.82 },
-  { name: 'Tokio', lat: 35.67, lon: 139.65 },
-  { name: 'Sídney', lat: -33.86, lon: 151.2 },
-];
-
-// ─── COMPONENTE PRINCIPAL ────────────────────────────────────────────────────
 export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
   onNavigate,
   onScanClick,
   walletStats,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
+  const visualWrapRef = useRef<HTMLDivElement>(null);
   const [webglSupported] = useState(() => isWebGLAvailable());
-  const [activeSector, setActiveSector] = useState<string>('Puntos Limpios');
+  const [activeModule, setActiveModule] = useState<string>('Puntos Limpios');
+  const [pulseBoost, setPulseBoost] = useState(false);
 
   const kgTotal = walletStats?.kgTotal ?? 1.43;
-  const saldo = walletStats?.saldo ?? 178;
+  const saldo = walletStats?.saldo ?? 128;
   const co2Total = walletStats?.co2Total ?? 2.08;
 
   useEffect(() => {
@@ -601,15 +126,14 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
 
     // 1. ESCENA Y CÁMARA
     const scene = new THREE.Scene();
-
     const camera = new THREE.PerspectiveCamera(
-      40,
+      42,
       container.clientWidth / container.clientHeight,
       0.1,
       100
     );
-    camera.position.set(0, 0.15, 4.55);
-    camera.lookAt(0, 0.02, 0);
+    camera.position.set(0, 0.08, 4.8);
+    camera.lookAt(0, 0.05, 0);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -618,262 +142,227 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.18;
+    renderer.toneMappingExposure = 1.25;
     container.appendChild(renderer.domElement);
 
-    // 2. SISTEMA DE ILUMINACIÓN CINEMATOGRÁFICA (3 PUNTOS + RIM LIGHT LIME)
-    const ambientLight = new THREE.HemisphereLight(0xdff6ff, 0x0b1d13, 0.85);
-    scene.add(ambientLight);
+    // 2. GRUPO RAÍZ ALINEADO CON EL PLANETA DE LA COMPOSICIÓN HIPERREALISTA
+    const rootGroup = new THREE.Group();
+    // El centro del globo en la composición está ligeramente por encima del centro vertical
+    rootGroup.position.set(0, 0.23, 0);
+    scene.add(rootGroup);
 
-    // Sol principal (Key Light)
-    const sunLight = new THREE.DirectionalLight(0xfffbf0, 2.8);
-    sunLight.position.set(-3.8, 3.6, 4.2);
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.set(1024, 1024);
-    sunLight.shadow.bias = -0.0005;
-    scene.add(sunLight);
+    const globeRadius = 1.04;
 
-    // Rim Light en verde lima de marca (#d7eb80) para perfilar manos y atmósfera
-    const rimLight = new THREE.DirectionalLight(0xd7eb80, 1.85);
-    rimLight.position.set(3.5, 1.5, -3.2);
-    scene.add(rimLight);
-
-    // Luz cálida inferior que ilumina las palmas y dedos desde abajo
-    const underLight = new THREE.PointLight(0x4ade80, 1.35, 7);
-    underLight.position.set(0, -1.8, 1.6);
-    scene.add(underLight);
-
-    // Luz cenital suave para dar brillo especular al océano
-    const oceanSpecLight = new THREE.PointLight(0x38bdf8, 1.1, 9);
-    oceanSpecLight.position.set(2.2, 2.4, 2.8);
-    scene.add(oceanSpecLight);
-
-    // 3. GRUPO MAESTRO DE LA COMPOSICIÓN (PLANETA + MANOS)
-    const compositionGroup = new THREE.Group();
-    scene.add(compositionGroup);
-
-    // 4. PLANETA TIERRA DETALLADO
-    const earthPivot = new THREE.Group();
-    earthPivot.position.set(0, 0.28, 0);
-    // Inclinación axial real de la Tierra (23.4°)
-    earthPivot.rotation.z = THREE.MathUtils.degToRad(16);
-    compositionGroup.add(earthPivot);
-
-    const earthRadius = 0.96;
-    const { colorTex, bumpTex, roughTex, cloudTex } = createEarthTextures();
-
-    const earthGeo = new THREE.SphereGeometry(earthRadius, 96, 96);
-    const earthMat = new THREE.MeshStandardMaterial({
-      map: colorTex,
-      bumpMap: bumpTex,
-      bumpScale: 0.032,
-      roughnessMap: roughTex,
-      roughness: 0.72,
-      metalness: 0.08,
-    });
-    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
-    earthMesh.castShadow = true;
-    earthMesh.receiveShadow = true;
-    earthMesh.rotation.y = -1.2; // Enfocar América / Atlántico al iniciar
-    earthPivot.add(earthMesh);
-
-    // Capa de nubes volumétricas
-    const cloudGeo = new THREE.SphereGeometry(earthRadius * 1.016, 72, 72);
-    const cloudMat = new THREE.MeshStandardMaterial({
+    // 3. ESFERA DE NUBES VOLUMÉTRICAS Y NODOS EN ROTACIÓN CONTINUA SOBRE EL PLANETA
+    const cloudTex = createDynamicCloudAndNodeTexture();
+    const cloudGeo = new THREE.SphereGeometry(globeRadius, 64, 64);
+    const cloudMat = new THREE.MeshBasicMaterial({
       map: cloudTex,
       transparent: true,
-      opacity: 0.78,
+      opacity: 0.62,
+      blending: THREE.AdditiveBlending,
       depthWrite: false,
-      roughness: 0.95,
     });
-    const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
-    earthPivot.add(cloudMesh);
+    const cloudSphere = new THREE.Mesh(cloudGeo, cloudMat);
+    cloudSphere.rotation.z = THREE.MathUtils.degToRad(-14);
+    rootGroup.add(cloudSphere);
 
-    // Atmósfera con Shader Fresnel (resplandor azul-esmeralda en el borde del planeta)
-    const atmosphereGeo = new THREE.SphereGeometry(earthRadius * 1.09, 64, 64);
-    const atmosphereMat = new THREE.ShaderMaterial({
+    // 4. HALO ATMOSFÉRICO FRESNEL EN TIEMPO REAL
+    const fresnelGeo = new THREE.SphereGeometry(globeRadius * 1.055, 64, 64);
+    const fresnelMat = new THREE.ShaderMaterial({
       transparent: true,
-      side: THREE.BackSide,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       uniforms: {
-        glowColor: { value: new THREE.Color(0x5eead4) },
-        rimColor: { value: new THREE.Color(0xd7eb80) },
+        uTime: { value: 0 },
+        uColorInner: { value: new THREE.Color(0x38bdf8) },
+        uColorOuter: { value: new THREE.Color(0x4ade80) },
       },
       vertexShader: `
         varying vec3 vNormal;
-        varying vec3 vViewPosition;
+        varying vec3 vViewDir;
         void main() {
           vNormal = normalize(normalMatrix * normal);
-          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-          vViewPosition = -mvPosition.xyz;
-          gl_Position = projectionMatrix * mvPosition;
+          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+          vViewDir = normalize(-mvPos.xyz);
+          gl_Position = projectionMatrix * mvPos;
         }
       `,
       fragmentShader: `
-        uniform vec3 glowColor;
-        uniform vec3 rimColor;
+        uniform float uTime;
+        uniform vec3 uColorInner;
+        uniform vec3 uColorOuter;
         varying vec3 vNormal;
-        varying vec3 vViewPosition;
+        varying vec3 vViewDir;
         void main() {
-          vec3 viewDir = normalize(vViewPosition);
-          float intensity = pow(0.68 - dot(vNormal, viewDir), 2.8);
-          vec3 finalColor = mix(glowColor, rimColor, 0.45);
-          gl_FragColor = vec4(finalColor, clamp(intensity * 0.88, 0.0, 1.0));
+          float fresnel = pow(1.0 - max(0.0, dot(vNormal, vViewDir)), 3.2);
+          float pulse = 0.88 + 0.12 * sin(uTime * 2.0);
+          vec3 col = mix(uColorInner, uColorOuter, fresnel);
+          gl_FragColor = vec4(col, fresnel * 0.58 * pulse);
         }
       `,
     });
-    const atmosphereMesh = new THREE.Mesh(atmosphereGeo, atmosphereMat);
-    earthPivot.add(atmosphereMesh);
+    const fresnelMesh = new THREE.Mesh(fresnelGeo, fresnelMat);
+    rootGroup.add(fresnelMesh);
 
-    // Anillo orbital exterior sutil (inspirado en el aro del diseño de referencia)
-    const orbitalRingGeo = new THREE.TorusGeometry(earthRadius * 1.24, 0.0055, 16, 128);
-    const orbitalRingMat = new THREE.MeshBasicMaterial({
-      color: 0xd7eb80,
-      transparent: true,
-      opacity: 0.38,
-    });
-    const orbitalRing = new THREE.Mesh(orbitalRingGeo, orbitalRingMat);
-    orbitalRing.rotation.x = Math.PI * 0.42;
-    orbitalRing.rotation.y = -0.28;
-    earthPivot.add(orbitalRing);
+    // 5. SISTEMA DE MÚLTIPLES ÓRBITAS Y ANILLOS HOLOGRÁFICOS DE DATOS EN VERDE VIBRANTE
+    const orbitsGroup = new THREE.Group();
+    rootGroup.add(orbitsGroup);
 
-    // Nodos geolocalizados (pines brillantes) + arcos de conexión sobre la superficie terrestre
-    const nodesGroup = new THREE.Group();
-    earthMesh.add(nodesGroup);
-
-    const pinGeo = new THREE.SphereGeometry(0.019, 12, 12);
-    const pinMat = new THREE.MeshBasicMaterial({ color: 0xd7eb80 });
-    const haloGeo = new THREE.RingGeometry(0.024, 0.042, 20);
-    const haloMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.75,
-    });
-
-    const nodeVectors: THREE.Vector3[] = [];
-    ECO_NODES.forEach((node) => {
-      const pos = latLonToVector3(node.lat, node.lon, earthRadius * 1.006);
-      nodeVectors.push(pos);
-
-      const pin = new THREE.Mesh(pinGeo, pinMat);
-      pin.position.copy(pos);
-      nodesGroup.add(pin);
-
-      const halo = new THREE.Mesh(haloGeo, haloMat);
-      halo.position.copy(pos.clone().multiplyScalar(1.003));
-      halo.lookAt(pos.clone().multiplyScalar(2));
-      nodesGroup.add(halo);
-    });
-
-    // Conectar pares de ciudades con arcos Bézier 3D elevados
-    const arcPairs = [
-      [0, 1],
-      [0, 2],
-      [0, 3],
-      [0, 4],
-      [0, 5],
-      [4, 5],
-      [5, 6],
-      [5, 7],
-      [6, 8],
-      [8, 9],
+    const orbitConfigs = [
+      { radius: 1.48, tube: 0.007, rotX: 1.18, rotY: -0.32, speed: 0.35, color: 0x4ade80, opacity: 0.72 },
+      { radius: 1.62, tube: 0.0045, rotX: 1.24, rotY: -0.28, speed: -0.28, color: 0xd7eb80, opacity: 0.55 },
+      { radius: 1.34, tube: 0.005, rotX: 0.85, rotY: 0.42, speed: 0.45, color: 0x22c55e, opacity: 0.48 },
+      { radius: 1.74, tube: 0.0035, rotX: 1.12, rotY: -0.36, speed: 0.22, color: 0x86efac, opacity: 0.35 },
     ];
-    const arcMat = new THREE.LineBasicMaterial({
-      color: 0xd7eb80,
-      transparent: true,
-      opacity: 0.55,
+
+    const orbitRings: Array<{ mesh: THREE.Mesh; speed: number }> = [];
+
+    orbitConfigs.forEach((cfg) => {
+      const torusGeo = new THREE.TorusGeometry(cfg.radius, cfg.tube, 16, 180);
+      const torusMat = new THREE.MeshBasicMaterial({
+        color: cfg.color,
+        transparent: true,
+        opacity: cfg.opacity,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const ring = new THREE.Mesh(torusGeo, torusMat);
+      ring.rotation.x = cfg.rotX;
+      ring.rotation.y = cfg.rotY;
+      orbitsGroup.add(ring);
+      orbitRings.push({ mesh: ring, speed: cfg.speed });
     });
 
-    arcPairs.forEach(([i, j]) => {
-      const start = nodeVectors[i];
-      const end = nodeVectors[j];
-      const mid = start.clone().add(end).multiplyScalar(0.5);
-      const dist = start.distanceTo(end);
-      mid.normalize().multiplyScalar(earthRadius + dist * 0.28);
+    // Pulsos de datos digitales viajando sobre las órbitas principales
+    const dataPulsesGroup = new THREE.Group();
+    orbitsGroup.add(dataPulsesGroup);
 
-      const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
-      const points = curve.getPoints(36);
-      const arcGeo = new THREE.BufferGeometry().setFromPoints(points);
-      const arcLine = new THREE.Line(arcGeo, arcMat);
-      nodesGroup.add(arcLine);
-    });
+    const pulseNodes: Array<{
+      mesh: THREE.Mesh;
+      radius: number;
+      angle: number;
+      speed: number;
+      rotX: number;
+      rotY: number;
+    }> = [];
 
-    // 5. DOS MANOS ESCULTURALES DETALLADAS QUE SOSTIENEN EL PLANETA
-    const handsPivot = new THREE.Group();
-    handsPivot.position.set(0, -0.68, 0.15);
-    compositionGroup.add(handsPivot);
-
-    // Material escultural de piel/porcelana cálida satinada con acabado físico realista
-    const sculptedSkinMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xd8a47f,
-      emissive: 0x261208,
-      emissiveIntensity: 0.18,
-      roughness: 0.42,
-      metalness: 0.08,
-      clearcoat: 0.28,
-      clearcoatRoughness: 0.35,
-      reflectivity: 0.6,
-    });
-
-    const handAccentMaterial = new THREE.MeshStandardMaterial({
-      color: 0xd7eb80,
-      emissive: 0x65a30d,
-      emissiveIntensity: 0.45,
-      roughness: 0.25,
-      metalness: 0.7,
-    });
-
-    const leftHand = buildSculptedHand('left', sculptedSkinMaterial, handAccentMaterial);
-    // Posicionar mano izquierda acunando el hemisferio inferior izquierdo de la Tierra
-    leftHand.root.position.set(-0.62, -0.04, 0.16);
-    leftHand.root.rotation.set(0.46, 0.48, -0.58);
-    leftHand.root.scale.setScalar(1.08);
-    handsPivot.add(leftHand.root);
-
-    const rightHand = buildSculptedHand('right', sculptedSkinMaterial, handAccentMaterial);
-    // Posicionar mano derecha acunando el hemisferio inferior derecho de la Tierra
-    rightHand.root.position.set(0.62, -0.04, 0.16);
-    rightHand.root.rotation.set(0.46, -0.48, 0.58);
-    rightHand.root.scale.setScalar(1.08);
-    handsPivot.add(rightHand.root);
-
-    // 6. PARTÍCULAS DE ENERGÍA SOSTENIBLE ASCENDIENDO DESDE LAS MANOS AL PLANETA
-    const particleCount = 140;
-    const particlePositions = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const radius = 0.85 + Math.random() * 0.65;
-      particlePositions[i * 3] = Math.cos(angle) * radius;
-      particlePositions[i * 3 + 1] = (Math.random() - 0.45) * 2.2;
-      particlePositions[i * 3 + 2] = Math.sin(angle) * radius;
+    const pulseGeo = new THREE.SphereGeometry(0.022, 12, 12);
+    for (let i = 0; i < 18; i++) {
+      const isGold = i % 4 === 0;
+      const pulseMat = new THREE.MeshBasicMaterial({
+        color: isGold ? 0xfacc15 : 0x86efac,
+        transparent: true,
+        opacity: 0.95,
+        blending: THREE.AdditiveBlending,
+      });
+      const mesh = new THREE.Mesh(pulseGeo, pulseMat);
+      const cfg = orbitConfigs[i % orbitConfigs.length];
+      pulseNodes.push({
+        mesh,
+        radius: cfg.radius,
+        angle: (i / 18) * Math.PI * 2,
+        speed: (0.45 + (i % 3) * 0.2) * (i % 2 === 0 ? 1 : -1),
+        rotX: cfg.rotX,
+        rotY: cfg.rotY,
+      });
+      dataPulsesGroup.add(mesh);
     }
-    const particleGeo = new THREE.BufferGeometry();
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-    const particleMat = new THREE.PointsMaterial({
-      color: 0xd7eb80,
-      size: 0.032,
-      transparent: true,
-      opacity: 0.75,
-    });
-    const particles = new THREE.Points(particleGeo, particleMat);
-    compositionGroup.add(particles);
 
-    // 7. INTERACCIÓN CON EL CURSOR Y PAUSA INTELIGENTE FUERA DEL VIEWPORT
-    let targetRotX = 0;
-    let targetRotY = 0;
+    // 6. RED DE CONSTELACIÓN HOLOGRÁFICA (NODOS CONECTADOS EN EL ANILLO EXTERIOR)
+    const networkPoints: THREE.Vector3[] = [];
+    for (let i = 0; i < 28; i++) {
+      const a = (i / 28) * Math.PI * 2;
+      const r = 1.45 + (Math.random() - 0.5) * 0.35;
+      const v = new THREE.Vector3(
+        Math.cos(a) * r,
+        (Math.random() - 0.5) * 0.28,
+        Math.sin(a) * r
+      );
+      v.applyEuler(new THREE.Euler(1.16, -0.3, 0));
+      networkPoints.push(v);
+    }
+
+    const linePositions: number[] = [];
+    for (let i = 0; i < networkPoints.length; i++) {
+      const p1 = networkPoints[i];
+      const p2 = networkPoints[(i + 1) % networkPoints.length];
+      const p3 = networkPoints[(i + 3) % networkPoints.length];
+      linePositions.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+      if (i % 2 === 0) {
+        linePositions.push(p1.x, p1.y, p1.z, p3.x, p3.y, p3.z);
+      }
+    }
+    const netGeo = new THREE.BufferGeometry();
+    netGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+    const netMat = new THREE.LineBasicMaterial({
+      color: 0x4ade80,
+      transparent: true,
+      opacity: 0.32,
+      blending: THREE.AdditiveBlending,
+    });
+    const networkLines = new THREE.LineSegments(netGeo, netMat);
+    orbitsGroup.add(networkLines);
+
+    // 7. PARTÍCULAS BRILLANTES (VERDE ESMERALDA + DESTELLOS ÁMBAR/DORADOS)
+    const particleCount = 160;
+    const pPositions = new Float32Array(particleCount * 3);
+    const pColors = new Float32Array(particleCount * 3);
+
+    const colorGreen = new THREE.Color(0x4ade80);
+    const colorLime = new THREE.Color(0xd7eb80);
+    const colorGold = new THREE.Color(0xfbbf24);
+
+    for (let i = 0; i < particleCount; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const r = 1.15 + Math.random() * 1.05;
+      const ySpread = (Math.random() - 0.5) * 1.65;
+
+      pPositions[i * 3] = Math.cos(theta) * r;
+      pPositions[i * 3 + 1] = ySpread;
+      pPositions[i * 3 + 2] = Math.sin(theta) * r * 0.65;
+
+      const c = i % 5 === 0 ? colorGold : i % 2 === 0 ? colorLime : colorGreen;
+      pColors[i * 3] = c.r;
+      pColors[i * 3 + 1] = c.g;
+      pColors[i * 3 + 2] = c.b;
+    }
+
+    const particlesGeo = new THREE.BufferGeometry();
+    particlesGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+    particlesGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
+
+    const particlesMat = new THREE.PointsMaterial({
+      size: 0.036,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const particleSystem = new THREE.Points(particlesGeo, particlesMat);
+    rootGroup.add(particleSystem);
+
+    // 8. INTERACCIÓN CON EL CURSOR (PARALLAX 3D DE LA IMAGEN Y EL HOLOGRAMA)
+    let targetX = 0;
+    let targetY = 0;
+
     const handlePointerMove = (e: PointerEvent) => {
       const rect = container.getBoundingClientRect();
       const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
       const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-      targetRotY = nx * 0.28;
-      targetRotX = ny * 0.14;
+      targetX = nx;
+      targetY = ny;
     };
+
+    const handlePointerLeave = () => {
+      targetX = 0;
+      targetY = 0;
+    };
+
     container.addEventListener('pointermove', handlePointerMove);
+    container.addEventListener('pointerleave', handlePointerLeave);
 
     let isVisible = true;
     const observer = new IntersectionObserver(
@@ -894,50 +383,56 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
     };
     window.addEventListener('resize', handleResize);
 
-    // 8. BUCLE DE ANIMACIÓN SUAVE
+    // 9. BUCLE DE ANIMACIÓN EN TIEMPO REAL
     const clock = new THREE.Clock();
     let rafId = 0;
+    let smoothX = 0;
+    let smoothY = 0;
+
+    const eulerHelper = new THREE.Euler();
 
     const animate = () => {
       rafId = requestAnimationFrame(animate);
       if (!isVisible) return;
 
       const t = clock.getElapsedTime();
+      fresnelMat.uniforms.uTime.value = t;
 
-      // Rotación continua y orgánica del planeta Tierra y su capa de nubes
-      earthMesh.rotation.y += 0.0024;
-      cloudMesh.rotation.y += 0.0032;
-      orbitalRing.rotation.z = t * 0.15;
+      // Suavizado de parallax
+      smoothX += (targetX - smoothX) * 0.06;
+      smoothY += (targetY - smoothY) * 0.06;
 
-      // Flotación suave del planeta y respiración coordinada de las manos
-      const breathe = Math.sin(t * 1.45);
-      earthPivot.position.y = 0.28 + breathe * 0.045;
-      handsPivot.position.y = -0.68 + breathe * 0.035;
+      // Rotación continua de las nubes y nodos sobre el globo
+      cloudSphere.rotation.y = t * 0.14 + smoothX * 0.35;
 
-      // Micro-articulación viva en cada dedo (sensación de cuidado y sostén real)
-      leftHand.fingers.forEach((fGroup, idx) => {
-        const firstPhalanx = fGroup.children[0];
-        if (firstPhalanx) {
-          firstPhalanx.rotation.x = 0.54 + Math.sin(t * 1.45 + idx * 0.35) * 0.045;
-        }
+      // Flotación / respiración orgánica sincronizada con el contenedor visual
+      const breathe = Math.sin(t * 1.5) * 0.035;
+      rootGroup.position.y = 0.23 + breathe;
+      rootGroup.rotation.y = smoothX * 0.26;
+      rootGroup.rotation.x = smoothY * 0.16;
+
+      if (visualWrapRef.current) {
+        const tx = smoothX * 10;
+        const ty = smoothY * 8 + Math.sin(t * 1.5) * 5;
+        const rx = -smoothY * 4.5;
+        const ry = smoothX * 6.5;
+        visualWrapRef.current.style.transform = `perspective(1100px) translate3d(${tx}px, ${ty}px, 0) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      }
+
+      // Rotación de los anillos orbitales y flujo de pulsos de datos
+      orbitRings.forEach((item, idx) => {
+        item.mesh.rotation.z = t * item.speed + idx * 0.8;
       });
-      rightHand.fingers.forEach((fGroup, idx) => {
-        const firstPhalanx = fGroup.children[0];
-        if (firstPhalanx) {
-          firstPhalanx.rotation.x = 0.54 + Math.sin(t * 1.45 + idx * 0.35) * 0.045;
-        }
+
+      pulseNodes.forEach((p) => {
+        const a = p.angle + t * p.speed;
+        p.mesh.position.set(Math.cos(a) * p.radius, Math.sin(a) * p.radius, 0);
+        eulerHelper.set(p.rotX, p.rotY, 0);
+        p.mesh.position.applyEuler(eulerHelper);
       });
 
-      // Oscilación sutil de las muñecas acunando el mundo
-      leftHand.root.rotation.z = -0.58 + breathe * 0.025;
-      rightHand.root.rotation.z = 0.58 - breathe * 0.025;
-
-      // Rotación de partículas orbitales
-      particles.rotation.y = t * 0.08;
-
-      // Seguimiento suave del cursor (parallax 3D)
-      compositionGroup.rotation.y += (targetRotY - compositionGroup.rotation.y) * 0.05;
-      compositionGroup.rotation.x += (targetRotX - compositionGroup.rotation.x) * 0.05;
+      networkLines.rotation.z = -t * 0.08;
+      particleSystem.rotation.y = t * 0.07;
 
       renderer.render(scene, camera);
     };
@@ -949,9 +444,10 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
       observer.disconnect();
       window.removeEventListener('resize', handleResize);
       container.removeEventListener('pointermove', handlePointerMove);
+      container.removeEventListener('pointerleave', handlePointerLeave);
 
       scene.traverse((obj) => {
-        if (obj instanceof THREE.Mesh) {
+        if (obj instanceof THREE.Mesh || obj instanceof THREE.Points || obj instanceof THREE.LineSegments) {
           obj.geometry.dispose();
           if (Array.isArray(obj.material)) {
             obj.material.forEach((m) => m.dispose());
@@ -961,16 +457,13 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
         }
       });
 
-      colorTex.dispose();
-      bumpTex.dispose();
-      roughTex.dispose();
       cloudTex.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     };
   }, [webglSupported]);
 
-  const sectorNavigation: Array<{ label: string; tab: string }> = [
+  const modulesList: Array<{ label: string; tab: string }> = [
     { label: 'Puntos Limpios', tab: 'mapa' },
     { label: 'Escáner IA Gemini', tab: 'escanear' },
     { label: 'Billetera Ecocoins', tab: 'billetera' },
@@ -979,32 +472,69 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
 
   return (
     <section
-      className="relative rounded-[24px] overflow-hidden border border-white/10 shadow-2xl"
+      className="relative rounded-[24px] overflow-hidden border border-emerald-500/20 shadow-[0_25px_80px_rgba(0,0,0,0.85)]"
       style={{
-        backgroundColor: '#090d0a',
-        backgroundImage:
-          'radial-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px), radial-gradient(circle at 75% 50%, rgba(45, 140, 58, 0.22) 0%, rgba(9, 13, 10, 0) 62%)',
-        backgroundSize: '28px 28px, 100% 100%',
-        minHeight: '610px',
+        backgroundColor: '#050b07',
+        backgroundImage: `
+          radial-gradient(rgba(74, 222, 128, 0.16) 1px, transparent 1px),
+          linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+          radial-gradient(circle at 73% 48%, rgba(16, 185, 129, 0.22) 0%, rgba(5, 11, 7, 0.96) 64%)
+        `,
+        backgroundSize: '28px 28px, 56px 56px, 56px 56px, 100% 100%',
+        minHeight: '640px',
       }}
     >
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 items-center min-h-[610px] px-6 sm:px-12 lg:px-16 py-12 gap-8">
-        {/* COLUMNA IZQUIERDA: JERARQUÍA EDITORIAL Y BOTONES DE DIRECCIONAMIENTO */}
-        <div className="lg:col-span-6 space-y-6 text-left">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/15 text-xs font-medium text-[#d7eb80] tracking-wider uppercase">
-            <span className="w-2 h-2 rounded-full bg-[#d7eb80] animate-pulse" />
-            Economía Circular Geolocalizada
+      {/* Marco superior sutil tipo ventana de plataforma corporativa futurista */}
+      <div className="relative z-20 flex items-center justify-between px-6 py-3 border-b border-white/[0.07] bg-black/40 backdrop-blur-md">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#22c55e]/80" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#eab308]/80" />
+          <span className="w-2.5 h-2.5 rounded-full bg-white/25" />
+          <span className="ml-2 text-[11px] font-mono text-white/45 tracking-wider">
+            ecocommunity://earth-telemetry-v4.2
+          </span>
+        </div>
+        <div className="flex items-center gap-2 text-[11px] font-mono text-emerald-400/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+          <span>TELEMETRÍA SATELITAL ACTIVA</span>
+        </div>
+      </div>
+
+      {/* CONTENEDOR PRINCIPAL 16:9 DE DOS COLUMNAS */}
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 items-center min-h-[590px] px-6 sm:px-12 lg:px-14 py-10 gap-8">
+        {/* ═══════════════════════════════════════════════════════════════════
+            SECCIÓN IZQUIERDA: JERARQUÍA EDITORIAL, CONTROLES, MÉTRICAS Y MÓDULOS
+           ═══════════════════════════════════════════════════════════════════ */}
+        <div className="lg:col-span-6 space-y-6 text-left relative z-20">
+          {/* Categoría técnica superior */}
+          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#0b2214]/90 border border-emerald-400/30 text-[11px] font-mono font-semibold text-[#86efac] tracking-[0.14em] uppercase shadow-[0_0_25px_rgba(34,197,94,0.18)]">
+            <span className="text-emerald-400">●</span>
+            <span>ECONOMÍA CIRCULAR GEOLOCALIZADA</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-bold tracking-[-0.03em] leading-[1.05]">
-            <span className="text-white block">Recicla. Impacta.</span>
+          {/* Título Principal Editorial */}
+          <h1 className="text-4xl sm:text-5xl xl:text-[56px] font-extrabold tracking-[-0.03em] leading-[1.06]">
+            <span className="text-white block drop-shadow-[0_2px_18px_rgba(255,255,255,0.12)]">
+              Recicla. Impacta.
+            </span>
             <span className="text-[#9ca3af] block mt-1">
               Transforma tu{' '}
-              <span className="text-[#d7eb80]">Entorno.</span>
+              <span
+                className="font-extrabold"
+                style={{
+                  background: 'linear-gradient(90deg, #d7eb80 0%, #D4AF37 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Entorno.
+              </span>
             </span>
           </h1>
 
-          <p className="text-sm sm:text-base text-[#a3a3a3] max-w-xl leading-relaxed">
+          {/* Descripción */}
+          <p className="text-sm sm:text-[15px] text-white/75 max-w-xl leading-relaxed font-normal">
             Una plataforma ciudadana para mapear reciclaje, validar entregas con IA Gemini y
             auditar impacto ambiental:{' '}
             <strong className="text-white font-semibold">
@@ -1013,83 +543,97 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
             , y cada pin alimenta recompensas Ecocoins y métricas ESG en tiempo real.
           </p>
 
-          {/* Dos botones principales con el contraste limpio de la referencia */}
-          <div className="flex flex-wrap items-center gap-3.5 pt-2">
+          {/* BOTONES DE ACCIÓN (Centro-Izquierda) */}
+          <div className="flex flex-wrap items-center gap-3.5 pt-1">
+            {/* Botón Principal Blanco Sólido */}
             <button
               type="button"
               onClick={onScanClick}
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-lg bg-white text-[#090d0a] text-xs sm:text-sm font-bold tracking-wider uppercase hover:bg-[#d7eb80] transition-all cursor-pointer shadow-lg"
+              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white text-[#070d09] text-xs sm:text-sm font-semibold tracking-wider uppercase shadow-[0_10px_30px_rgba(255,255,255,0.22)] hover:bg-[#d7eb80] hover:scale-[1.02] active:scale-[0.99] transition-all cursor-pointer"
             >
               <span>ESCANEAR RESIDUO</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </button>
 
+            {/* Botón Secundario Oscuro con Borde Verde Translúcido */}
             <button
               type="button"
               onClick={() => onNavigate?.('mapa')}
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-lg bg-[#111713] text-white border border-white/15 hover:border-[#d7eb80]/60 text-xs sm:text-sm font-bold tracking-wider uppercase transition-all cursor-pointer"
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#0b1911]/90 text-white border border-emerald-400/35 hover:border-emerald-400/80 hover:bg-[#11281b] text-xs sm:text-sm font-semibold tracking-wider uppercase shadow-[0_0_25px_rgba(16,185,129,0.15)] transition-all cursor-pointer"
             >
-              <MapPin className="w-4 h-4 text-[#2d8c3a]" />
-              <span>EXPLORAR PUNTOS LIMPIOS</span>
+              <MapPin className="w-4 h-4 text-emerald-400" />
+              <span>☉ EXPLORAR PUNTOS LIMPIOS</span>
             </button>
           </div>
 
-          {/* Barra de métricas en tiempo real */}
-          <div className="grid grid-cols-3 gap-3 max-w-lg pt-2">
-            <div className="px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/10">
-              <div className="flex items-center gap-1.5 text-xs text-[#9ca3af]">
+          {/* TARJETAS DE DATOS GLASSMORPHISM (Métricas en Tiempo Real) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2 max-w-xl">
+            {/* Tarjeta 1: Desviado */}
+            <div className="p-3.5 rounded-2xl bg-white/[0.045] backdrop-blur-md border border-white/10 hover:border-emerald-400/35 transition-colors">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-300/90">
                 <TreePine className="w-3.5 h-3.5 text-[#d7eb80]" />
-                <span>Desviado</span>
+                <span>⏃ Desviado</span>
               </div>
-              <div className="text-lg font-bold text-white tabular-nums mt-0.5">
+              <div className="text-xl sm:text-2xl font-bold text-white tabular-nums mt-1">
                 {kgTotal} kg
               </div>
+              <span className="text-[11px] text-white/55 block mt-0.5 leading-snug">
+                Material desviado de vertedero
+              </span>
             </div>
 
-            <div className="px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/10">
-              <div className="flex items-center gap-1.5 text-xs text-[#9ca3af]">
-                <Coins className="w-3.5 h-3.5 text-[#d7eb80]" />
-                <span>Billetera</span>
+            {/* Tarjeta 2: Billetera */}
+            <div className="p-3.5 rounded-2xl bg-white/[0.045] backdrop-blur-md border border-white/10 hover:border-emerald-400/35 transition-colors">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-300/90">
+                <Coins className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <span>☉ Billetera</span>
               </div>
-              <div className="text-lg font-bold text-[#d7eb80] tabular-nums mt-0.5">
+              <div className="text-xl sm:text-2xl font-bold text-[#d7eb80] tabular-nums mt-1">
                 {saldo} EC
               </div>
+              <span className="text-[11px] text-white/55 block mt-0.5 leading-snug">
+                Ecocoins en tu billetera
+              </span>
             </div>
 
-            <div className="px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/10">
-              <div className="flex items-center gap-1.5 text-xs text-[#9ca3af]">
-                <Leaf className="w-3.5 h-3.5 text-[#d7eb80]" />
-                <span>CO₂ Ahorrado</span>
+            {/* Tarjeta 3: CO2 Ahorrado */}
+            <div className="p-3.5 rounded-2xl bg-white/[0.045] backdrop-blur-md border border-white/10 hover:border-emerald-400/35 transition-colors">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-300/90">
+                <Leaf className="w-3.5 h-3.5 text-emerald-400" />
+                <span>∅ CO₂ Ahorrado</span>
               </div>
-              <div className="text-lg font-bold text-white tabular-nums mt-0.5">
+              <div className="text-xl sm:text-2xl font-bold text-white tabular-nums mt-1">
                 {co2Total} kg
               </div>
+              <span className="text-[11px] text-white/55 block mt-0.5 leading-snug">
+                Huella de CO₂ compensada
+              </span>
             </div>
           </div>
 
-          {/* SECTORES / MÓDULOS CLICABLES */}
+          {/* PIE DE PÁGINA (MÓDULOS INDUSTRIAL-TECNOLÓGICOS) */}
           <div className="pt-4 border-t border-white/10 max-w-xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-mono uppercase tracking-widest text-[#737373] mr-1">
+              <span className="text-[11px] font-mono uppercase tracking-[0.16em] text-white/50 mr-1">
                 MÓDULOS:
               </span>
-              {sectorNavigation.map((item) => {
-                const isSelected = activeSector === item.label;
+              {modulesList.map((mod) => {
+                const isSelected = activeModule === mod.label;
                 return (
                   <button
-                    key={item.label}
+                    key={mod.label}
                     type="button"
                     onClick={() => {
-                      setActiveSector(item.label);
-                      onNavigate?.(item.tab);
+                      setActiveModule(mod.label);
+                      onNavigate?.(mod.tab);
                     }}
-                    className={`px-3 py-1 rounded text-xs font-mono transition-all cursor-pointer border ${
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-mono transition-all cursor-pointer border ${
                       isSelected
-                        ? 'bg-white/15 text-white border-[#d7eb80]/60'
-                        : 'bg-white/[0.04] text-[#a3a3a3] border-white/10 hover:text-white hover:border-white/30'
+                        ? 'bg-emerald-500/20 text-[#d7eb80] border-emerald-400/60 shadow-[0_0_15px_rgba(74,222,128,0.2)]'
+                        : 'bg-white/[0.03] text-white/70 border-white/15 hover:text-white hover:border-emerald-400/40'
                     }`}
                   >
-                    {item.label}
+                    [ {mod.label} ]
                   </button>
                 );
               })}
@@ -1097,37 +641,61 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
           </div>
         </div>
 
-        {/* COLUMNA DERECHA: ESCENA 3D INTERACTIVA (PLANETA TIERRA + 2 MANOS ESCULTURALES) */}
-        <div className="lg:col-span-6 relative flex items-center justify-center min-h-[420px] sm:min-h-[520px]">
-          {/* Aro exterior decorativo de alto contraste (como en la referencia) */}
+        {/* ═══════════════════════════════════════════════════════════════════
+            SECCIÓN VISUAL 3D (Derecha): TIERRA HIPERREALISTA + MANOS + HOLOGRAMA THREE.JS
+           ═══════════════════════════════════════════════════════════════════ */}
+        <div className="lg:col-span-6 relative flex items-center justify-center min-h-[450px] sm:min-h-[540px] select-none">
+          {/* Resplandor ambiental Bloom controlado detrás del planeta */}
           <div
-            className="pointer-events-none absolute w-[330px] h-[330px] sm:w-[430px] sm:h-[430px] rounded-full border-[10px] border-white/15 shadow-[0_0_90px_rgba(215,235,128,0.12)]"
+            className="pointer-events-none absolute w-[380px] h-[380px] sm:w-[490px] sm:h-[490px] rounded-full blur-3xl transition-opacity duration-500"
+            style={{
+              background:
+                'radial-gradient(circle, rgba(34, 197, 94, 0.28) 0%, rgba(16, 185, 129, 0.10) 48%, rgba(5, 11, 7, 0) 75%)',
+              opacity: pulseBoost ? 1 : 0.8,
+            }}
             aria-hidden="true"
           />
 
-          {webglSupported ? (
-            <div
-              ref={mountRef}
-              className="w-full h-[440px] sm:h-[520px] cursor-grab active:cursor-grabbing"
-              title="Mueve el cursor para rotar la escena 3D"
+          {/* Contenedor con inclinación 3D sincronizada entre el render hiperrealista y Three.js */}
+          <div
+            ref={visualWrapRef}
+            className="relative w-full max-w-[640px] h-[440px] sm:h-[520px] flex items-center justify-center transition-transform duration-75 ease-out"
+          >
+            {/* Capa Base Hiperrealista: Planeta Tierra con continentes, nubes y manos humanas detalladas */}
+            <img
+              src="/images/earth_hands_hero.jpg"
+              alt="Planeta Tierra hiperrealista sostenido con delicadeza por dos manos humanas rodeado de órbitas holográficas"
+              className="pointer-events-none w-full h-full object-contain scale-[1.12] sm:scale-[1.18]"
+              style={{
+                maskImage:
+                  'radial-gradient(ellipse 68% 66% at 50% 50%, rgba(0,0,0,1) 62%, rgba(0,0,0,0.65) 80%, rgba(0,0,0,0) 98%)',
+                WebkitMaskImage:
+                  'radial-gradient(ellipse 68% 66% at 50% 50%, rgba(0,0,0,1) 62%, rgba(0,0,0,0.65) 80%, rgba(0,0,0,0) 98%)',
+                filter: pulseBoost
+                  ? 'saturate(1.22) contrast(1.08) drop-shadow(0 0 35px rgba(74, 222, 128, 0.35))'
+                  : 'saturate(1.1) contrast(1.05)',
+              }}
             />
-          ) : (
-            <div className="flex flex-col items-center justify-center text-center p-8 rounded-full w-[340px] h-[340px] bg-white/5 border border-white/15">
-              <ShieldCheck className="w-12 h-12 text-[#d7eb80] mb-3" />
-              <p className="text-sm font-semibold text-white">
-                Planeta Tierra Sostenible
-              </p>
-              <p className="text-xs text-white/60 mt-1">
-                Modo estático activado (WebGL no disponible en este navegador)
-              </p>
-            </div>
-          )}
 
-          {/* Indicador interactivo inferior derecho */}
-          <div className="absolute bottom-2 right-2 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 border border-white/15 backdrop-blur-md text-[11px] font-mono text-[#d7eb80]">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Tierra PBR + Manos 3D · Interactivo</span>
+            {/* Capa WebGL Three.js en Tiempo Real: Órbitas holográficas 3D, nubes dinámicas y partículas */}
+            {webglSupported && (
+              <div
+                ref={mountRef}
+                className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing z-10"
+                title="Interactúa con el holograma 3D del planeta Tierra"
+              />
+            )}
           </div>
+
+          {/* ETIQUETA DE INTERACCIÓN (Esquina inferior derecha) */}
+          <button
+            type="button"
+            onClick={() => setPulseBoost((prev) => !prev)}
+            className="absolute bottom-3 right-3 z-30 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#07120b]/90 border border-emerald-400/35 hover:border-[#d7eb80] backdrop-blur-md text-xs font-mono text-white shadow-[0_0_24px_rgba(34,197,94,0.25)] transition-all cursor-pointer"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#d7eb80]" />
+            <span>✨ Tierra 3D • Interactivo</span>
+          </button>
         </div>
       </div>
     </section>
