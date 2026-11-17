@@ -5,16 +5,16 @@
 
 ---
 
-**Integrantes del Proyecto:**  
-- [POR CONFIRMAR: Nombre del Aprendiz 1 / Rol Líder de Proyecto]  
-- [POR CONFIRMAR: Nombre del Aprendiz 2 / Analista y Desarrollador]  
-- [POR CONFIRMAR: Nombre del Aprendiz 3 / Diseñador UI/UX y QA Tester]  
-- [POR CONFIRMAR: Nombre del Aprendiz 4 / Desarrollador Full-Stack]  
+**Autora del Proyecto:**  
+- **Paula Valentina Vargas Andrade** — *Líder de Proyecto, Analista de Requisitos, Diseñadora UI/UX y Desarrolladora Full-Stack (Python / Flask / React / MySQL)*  
 
-**Centro de Formación:** SENA – Centro de la Industria, la Empresa y los Servicios / [POR CONFIRMAR: Regional]  
+**Instructor Técnico:**  
+- **Javier Umberto Pinto** — *Instructor Técnico SENA (Seguimiento y Evaluación de Ingeniería de Software)*  
+
+**Centro de Formación:** SENA – Centro de la Industria, la Empresa y los Servicios  
 **Programa:** Tecnólogo en Análisis y Desarrollo de Software (ADSO)  
-**Fecha de Consolidación:** 13/11/2026  
-**Versión:** 1.0 (Versión consolidada y alineada a la arquitectura y código base)
+**Fecha de Consolidación:** 17/11/2026  
+**Versión:** 2.0 (Versión consolidada final — Arquitectura Python / Flask / MySQL XAMPP / Liquibase / Three.js WebGL)
 
 ---
 
@@ -52,6 +52,7 @@
     - [3.3.6. Módulo de Trazabilidad ESG, Cadena de Custodia y Reportes de Circularidad](#336-módulo-de-trazabilidad-esg-cadena-de-custodia-y-reportes-de-circularidad)
     - [3.3.7. Módulo de Resiliencia Fuera de Línea (Offline-First y Sincronización)](#337-módulo-de-resiliencia-fuera-de-línea-offline-first-y-sincronización)
     - [3.3.8. Módulo de Administración y Auditoría del Sistema](#338-módulo-de-administración-y-auditoría-del-sistema)
+    - [3.3.9. Módulo de Histórico Interactivo en Base de Datos, Migraciones y Optimización Operativa (Etapas 2 y 3: RF-019 a RF-028)](#339-módulo-de-histórico-interactivo-en-base-de-datos-migraciones-y-optimización-operativa-etapas-2-y-3-rf-019-a-rf-028)
   - [3.4. Requerimientos No Funcionales](#34-requerimientos-no-funcionales)
 - [4. Requisitos de casos de uso](#4-requisitos-de-casos-de-uso)
   - [4.1. Diagrama UML de Casos de Uso](#41-diagrama-uml-de-casos-de-uso)
@@ -110,36 +111,34 @@ Desarrollar una multiplataforma digital inteligente de intermediación, clasific
 ### 1.5. Alcances
 El desarrollo se estructura en tres etapas incrementales:
 
-- **Etapa 1 – MVP Operativo:**
+- **Etapa 1 – MVP Operativo (Implementado):**
   - Autenticación y roles de usuario (Ciudadano, Recolector, Centro de Acopio, Marca Aliada, Admin).
-  - Escáner y clasificación por IA Gemini Vision y catálogo de código de barras.
+  - Escáner y clasificación por IA Gemini Vision y catálogo de código de barras en MySQL.
   - Directorio y mapa de Puntos Limpios con cálculo de distancia y geofencing ($\le 20$ m).
-  - Depósito seguro con lectura de QR y control antifraude básico (cooldown 24h).
+  - Depósito seguro con lectura de QR y control antifraude de 24 horas en base de datos relacional.
   - Billetera de Ecocoins (abono de puntos y métricas de $CO_2$ y kg reciclados).
   - Catálogo de recompensas y generación de voucher digital.
-  - Recibo digital con hash de entrega.
+  - Recibo digital con hash criptográfico de entrega.
 
-- **Etapa 2 – Optimización e Integración Operativa:**
-  - Portales privados avanzados para Recolectores Urbanos y Puntos de Acopio (pesaje industrial y actualización de cadena de custodia).
-  - Portal de Marcas Aliadas para autogestión de stock de recompensas e impacto de marca.
-  - Modo fuera de línea (*Offline-First*) con sincronización de depósitos al reconectar.
-  - Auditoría administrativa avanzada y bloqueo de cuentas por infracciones.
+- **Etapa 2 – Optimización, Base de Datos Relacional e Integración Operativa (Implementado):**
+  - Migración del backend principal a **Python 3.12 / Flask** (`app.py`) conectado a **MySQL / MariaDB en XAMPP** (`ecocommunity_db`).
+  - Gestión de migraciones y control de versiones de esquema relacional con **Liquibase** (`db.changelog-master.xml`).
+  - Módulo interactivo de **Histórico de Base de Datos** (`HistoricoModal.tsx`) con búsqueda, filtros y actualización en tiempo real de la cadena de custodia (`PUT /api/entregas/<id>/custodia`).
+  - Hero 3D interactivo de telemetría ambiental con **Three.js / WebGL** (`HeroThreeJS.tsx`).
+  - Portales privados especializados para Recolectores Urbanos, Puntos de Acopio y Marcas Aliadas.
+  - Modo fuera de línea (*Offline-First*) con sincronización de depósitos al reconectar y auditoría administrativa.
 
-- **Etapa 3 – Expansión y Escalabilidad:**
+- **Etapa 3 – Expansión y Escalabilidad Futura:**
   - Aplicación móvil nativa Android con integración de sensores de hardware (cámara y GPS nativo).
-  - Integración telemática con sensores IoT de nivel de llenado de contenedores en tiempo real.
-  - Integración con pasarelas de pago o transferencias directas de saldo de billetera [POR CONFIRMAR].
-  - Certificación de bonos de carbono bajo estándares internacionales [POR CONFIRMAR].
+  - Integración telemática con sensores IoT ultrasónicos de nivel de llenado de contenedores en tiempo real.
+  - Certificación automatizada de bonos de carbono bajo estándares internacionales ISO 14064 / Verra.
 
 ### 1.6. Personal Involucrado
 
-| Nombre Completo | Cargo / Función | Categoría profesional | Responsabilidades | Datos de contacto |
+| Nombre Completo | Cargo / Función | Categoría profesional | Responsabilidades | Entidad |
 | :--- | :--- | :--- | :--- | :--- |
-| [POR CONFIRMAR: Instructor Asignado] | Instructor Técnico | Ingeniero de Sistemas | Supervisión técnica y metodológica del proyecto formativo. | [POR CONFIRMAR: Correo SENA] |
-| [POR CONFIRMAR: Aprendiz 1] | Líder de Proyecto y Analista de Requisitos | Aprendiz Tecnólogo ADSO | Coordinación general, especificación del SRS, diseño de reglas de negocio y control de entregables. | [POR CONFIRMAR: Correo electrónico] |
-| [POR CONFIRMAR: Aprendiz 2] | Analista y Diseñador de Software | Aprendiz Tecnólogo ADSO | Modelado conceptual de datos, diseño de diagramas UML, casos de uso y diseño de base de datos. | [POR CONFIRMAR: Correo electrónico] |
-| [POR CONFIRMAR: Aprendiz 3] | Diseñadora UI/UX y QA Tester | Aprendiz Tecnólogo ADSO | Diseño de prototipos, paleta de colores accesible, pruebas funcionales y validación de usabilidad. | [POR CONFIRMAR: Correo electrónico] |
-| [POR CONFIRMAR: Aprendiz 4] | Desarrollador Full-Stack Principal | Aprendiz Tecnólogo ADSO | Implementación de frontend (React/Vite), backend (Node/Express), integración con Gemini API y APIs REST. | [POR CONFIRMAR: Correo electrónico] |
+| **Javier Umberto Pinto** | Instructor Técnico | Instructor de Ingeniería de Software | Supervisión técnica, metodológica y evaluación de calidad del proyecto formativo. | SENA |
+| **Paula Valentina Vargas Andrade** | Autora, Líder de Proyecto, Analista de Requisitos, Diseñadora UI/UX y Desarrolladora Full-Stack | Aprendiz Tecnóloga ADSO | Especificación integral del SRS, modelado de base de datos MySQL y Liquibase, desarrollo del backend en Python/Flask, frontend React/TypeScript con Three.js WebGL y suite de pruebas QA automatizadas. | SENA – ADSO |
 
 ### 1.7. Definiciones, Acrónimos y Abreviaturas
 
@@ -149,8 +148,9 @@ El desarrollo se estructura en tres etapas incrementales:
 | **Geofencing** | Perímetro geográfico virtual que restringe la ejecución de un depósito a un radio máximo de 20 metros. |
 | **Haversine** | Ecuación trigonométrica para calcular la distancia ortodrómica entre dos puntos sobre una esfera a partir de sus coordenadas GPS. |
 | **Ecocoins** | Puntos de fidelidad digital acreditados al usuario por cada entrega válida de residuos. |
-| **Gemini Vision AI** | Modelo multimodal de inteligencia artificial (`gemini-3.8-flash`) utilizado para identificar materiales en imágenes. |
+| **Gemini Vision AI** | Modelo multimodal de inteligencia artificial (`gemini-2.5-flash` / `gemini-3.8-flash`) utilizado para identificar materiales en imágenes. |
 | **Cadena de Custodia** | Trazabilidad del residuo a través de los estados: *depositado*, *recolectado*, *en_acopio* y *transformado*. |
+| **Liquibase** | Herramienta de control de versiones y migración de esquemas de bases de datos relacionales mediante changelogs XML y SQL. |
 | **ESG** | Criterios Ambientales, Sociales y de Gobernanza (*Environmental, Social, and Governance*). |
 | **Hash Digital** | Cadena alfanumérica única generada para garantizar la inmutabilidad de cada recibo de depósito. |
 | **Offline-First** | Estrategia de diseño que almacena acciones en caché local cuando no hay conexión a internet y las procesa al restaurarse. |
@@ -162,25 +162,27 @@ El desarrollo se estructura en tres etapas incrementales:
 - **Ministerio de Ambiente y Desarrollo Sostenible (MADS).** Resolución 1407 de 2018. *Gestión ambiental de residuos de envases y empaques.*
 - **Ministerio de Ambiente y Desarrollo Sostenible (MADS).** Resolución 2184 de 2019. *Código unificado de colores para la separación de residuos en la fuente.*
 - **IEEE Computer Society.** IEEE Std 830-1998. *IEEE Recommended Practice for Software Requirements Specifications.*
-- **Google Cloud.** Gemini API Documentation (`@google/genai` SDK v2.4+). *Multimodal structured outputs and JSON Schema generation.*
+- **Google Cloud.** Gemini API Documentation (`google-genai` Python SDK & `@google/genai` SDK). *Multimodal structured outputs and JSON Schema generation.*
+- **Liquibase.** (2026). *Database Schema Change Management and Changelog Specification.*
 - **DANE.** (2026). *Encuesta de Calidad de Vida e Indicadores Ambientales y de Sostenibilidad Urbana.*
 
 ### 1.9. Resumen del Proyecto
-**EcoCommunity** es un ecosistema multiplataforma (Web React + API Express + Arquitectura adaptable a Android) que promueve la economía circular mediante incentivos auditables. La plataforma combina la clasificación asistida por Inteligencia Artificial y códigos de barras con mecanismos antifraude basados en geofencing satelital y códigos QR físicos. Cada depósito genera un recibo digital verificable y acredita **Ecocoins** en una billetera comunitaria, alimentando simultáneamente tableros ESG que miden kg reciclados, ahorro de $CO_2$ y equivalencia en árboles conservados.
+**EcoCommunity** es un ecosistema multiplataforma (Frontend Web React 19 + Three.js WebGL y Backend principal en **Python 3.12 / Flask** con persistencia en **MySQL XAMPP** y versionamiento **Liquibase**) que promueve la economía circular mediante incentivos auditables. La plataforma combina la clasificación asistida por Inteligencia Artificial y códigos de barras con mecanismos antifraude basados en geofencing satelital y códigos QR físicos. Cada depósito genera un recibo digital verificable, persiste en MySQL con trazabilidad interactiva de cadena de custodia y acredita **Ecocoins** en una billetera comunitaria, alimentando simultáneamente tableros ESG que miden kg reciclados, ahorro de $CO_2$ y equivalencia en árboles conservados.
 
 ---
 
 ## 2. Descripción General
 
 ### 2.1. Perspectiva del Producto
-EcoCommunity es un sistema independiente y centralizado que opera bajo una arquitectura cliente-servidor enriquecida con capacidades de inferencia en la nube (Google Gemini AI) y almacenamiento relacional estructurado. La solución expone servicios RESTful consumibles tanto por portales web especializados como por clientes móviles, ofreciendo una experiencia responsiva con soporte sin conexión.
+EcoCommunity es un sistema independiente y centralizado que opera bajo una arquitectura cliente-servidor enriquecida con capacidades de inferencia en la nube (Google Gemini AI), visualización 3D interactiva (Three.js / WebGL) y almacenamiento relacional estructurado en **MySQL / MariaDB (XAMPP)** administrado con **Liquibase**. La solución expone servicios RESTful desde **Python / Flask** consumibles tanto por portales web especializados como por clientes móviles, ofreciendo una experiencia responsiva con soporte sin conexión.
 
 ```mermaid
 flowchart TD
-    Cliente[Cliente Web / Móvil PWA] -->|HTTPS / REST API| Gateway[Express Backend / API Router]
-    Gateway -->|Inferencia Multimodal| Gemini[Google Gemini 3.8 Flash AI]
+    Cliente[Cliente Web React 19 + Three.js WebGL] -->|HTTPS / REST API| Gateway[Python 3.12 Flask Backend - app.py]
+    Gateway -->|Inferencia Multimodal| Gemini[Google Gemini Flash AI]
     Gateway -->|Verificación Satelital| Haversine[Módulo Geofencing <= 20m]
-    Gateway -->|Persistencia & Trazabilidad| DB[(Base de Datos Relacional)]
+    Gateway -->|PyMySQL UTF8MB4| DB[(MySQL XAMPP: ecocommunity_db)]
+    Liquibase[Liquibase Changelogs XML/SQL] -->|Versionamiento DDL/Seed| DB
     Gateway -->|Contratos de Canje| Marcas[Ecosistema Marcas Aliadas]
 ```
 
@@ -204,8 +206,8 @@ flowchart TD
   - Los contenedores físicos portan un código QR adhesivo legible y resistente al intemperismo.
   - Las marcas aliadas honran los códigos de voucher emitidos por la plataforma en sus puntos de venta.
 - **Dependencias:**
-  - Disponibilidad del servicio de la API de Google Gemini (`gemini-3.8-flash`) con fallback local heurístico ante cortes de red.
-  - Conectividad a Internet en el servidor backend para el procesamiento transaccional en tiempo real.
+  - Disponibilidad del servicio de la API de Google Gemini con fallback local heurístico ante cortes de red.
+  - Servicio MySQL/MariaDB activo en XAMPP (puerto 3306, base de datos `ecocommunity_db`).
   - Sistema de geolocalización satelital del navegador/dispositivo del usuario.
 
 ---
@@ -215,11 +217,10 @@ flowchart TD
 ### 3.1. Requisitos comunes de las interfaces
 
 #### 3.1.1. Interfaces de usuario
-- Diseño limpio y adaptable basado en Tailwind CSS, optimizado para interacción táctil en pantallas móviles y monitores de escritorio.
-- Navegación inferior persistente (*Bottom Navigation Bar*) en vista móvil para acceso rápido a: Escáner, Mapa, Billetera/Premios y Reportes ESG.
-- Modales contextuales claros con confirmación de depósito, recibo digital con código hash y vista de voucher de canje con código QR.
+- Diseño limpio y adaptable basado en Tailwind CSS, con Hero corporativo futurista 16:9 que integra el planeta Tierra hiperrealista en manos humanas y órbitas holográficas 3D en tiempo real con **Three.js / WebGL** (`HeroThreeJS.tsx`).
+- Navegación superior e inferior persistente (*Bottom Navigation Bar*) para acceso directo a: Inicio, Escáner, Mapa, Billetera/Premios, Reportes ESG e **Histórico BD MySQL** (`HistoricoModal.tsx`).
+- Modales contextuales claros con confirmación de depósito, recibo digital con código hash, histórico interactivo maestro-detalle y vista de voucher de canje con código QR.
 - Indicador visual persistente de conectividad (Banner "Modo Fuera de Línea") que alerta cuando las acciones se guardan en cola local.
-- Paleta cromática con contraste accesible (verde esmeralda, gris pizarra y fondos claros) alineada con temáticas ecológicas.
 
 #### 3.1.2. Interfaces de hardware
 - Cámara integrada en smartphones o computadores portátiles con resolución mínima de 720p para captura de empaques y lectura de códigos de barras/QR.
@@ -227,9 +228,11 @@ flowchart TD
 - Servidor de alojamiento con procesador mínimo de 2 núcleos x86_64, 4 GB de RAM y almacenamiento en disco sólido (SSD).
 
 #### 3.1.3. Interfaces de software
-- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS, Lucide React Icons, Canvas Confetti.
-- **Backend:** Node.js (v22+), Express 4, TypeScript (`tsx`).
-- **SDK de IA:** `@google/genai` (SDK oficial de Google Cloud para Gemini API).
+- **Frontend:** React 19, TypeScript, Vite 8, Tailwind CSS 4, Three.js (WebGL 3D), Lucide React Icons, Canvas Confetti.
+- **Backend Principal:** Python 3.12, Flask 3.1, Flask-CORS, PyMySQL (`charset=utf8mb4`), Python-Dotenv (`app.py` en puerto 5000).
+- **Backend Secundario / Contingencia:** Node.js (v22+), Express 4, TypeScript (`server.ts` en puerto 3000).
+- **Base de Datos y Migraciones:** MySQL / MariaDB 10.4+ (XAMPP) y **Liquibase** (`db.changelog-master.xml`, changelogs SQL y XML).
+- **SDK de IA:** `google-genai` (Python) y `@google/genai` (TypeScript) para Google Gemini API.
 - **Almacenamiento del cliente:** Web Storage API (`localStorage`) para colas offline y persistencia de sesión.
 - **Navegadores soportados:** Google Chrome (v110+), Mozilla Firefox (v115+), Microsoft Edge (v110+), Safari (v16+).
 
@@ -476,11 +479,105 @@ flowchart TD
 | Identificador: RF-018 | Nombre: Auditoría Transaccional y Detección de Anomalías |
 | :--- | :--- |
 | **Tipo:** Necesario | **¿Crítico?** Sí \| **Prioridad:** Alta |
-| **Requerimiento que utiliza/especializa:** Registro de auditoría | **Documentos asociados:** AdminPrivateWeb |
+| **Requerimiento que utiliza/especializa:** Registro de auditoría | **Documentos asociados:** AdminPrivateWeb / tabla `registro_auditoria` |
 | **Entrada:** Filtros de búsqueda de entregas y transacciones. | **Salida:** Registro cronológico detallado de IP, coordenadas, usuario, monto y hash de cada transacción. |
-| **Descripción:** Proporciona trazabilidad completa sobre cualquier actividad del sistema, permitiendo identificar intentos reiterados de violación de geofencing o fraude. |
+| **Descripción:** Proporciona trazabilidad completa sobre cualquier actividad del sistema en MySQL, permitiendo identificar intentos reiterados de violación de geofencing o fraude. |
 | **Manejo de situaciones anormales:** Notificación automática en el panel ante más de 3 rechazos consecutivos de geofencing de una misma cuenta. |
-| **Criterios de aceptación:** Inmutabilidad de los registros de auditoría almacenados. |
+| **Criterios de aceptación:** Inmutabilidad de los registros de auditoría almacenados en `registro_auditoria`. |
+
+---
+
+#### 3.3.9. Módulo de Histórico Interactivo en Base de Datos, Migraciones y Optimización Operativa (Etapas 2 y 3: RF-019 a RF-028)
+
+| Identificador: RF-019 | Nombre: Consulta y Filtrado Interactivo del Histórico de Entregas en MySQL |
+| :--- | :--- |
+| **Tipo:** Necesario | **¿Crítico?** Sí \| **Prioridad:** Alta |
+| **Requerimiento que utiliza/especializa:** Endpoint `GET /api/entregas/history` | **Documentos asociados:** `HistoricoModal.tsx` / `app.py` |
+| **Entrada:** Parámetros opcionales de consulta (`categoria`, `custodia`, `q` texto de búsqueda por material, usuario o hash). | **Salida:** Listado maestro-detalle de entregas en MySQL con información del usuario, punto limpio, coordenadas, hash criptográfico y resumen estadístico. |
+| **Descripción:** Permite abrir en cualquier momento desde la barra de navegación el modal interactivo **Histórico BD**, consultando en vivo la tabla `entregas` en MySQL (`ecocommunity_db`) con filtrado instantáneo por categoría, estado de custodia o texto libre. |
+| **Manejo de situaciones anormales:** Si la búsqueda no arroja coincidencias, presenta estado vacío amigable con opción de limpiar filtros. |
+| **Criterios de aceptación:** 1. Sincronización en tiempo real con MySQL XAMPP.<br>2. Vista maestro-detalle que permite abrir el Recibo Digital Criptográfico de cualquier entrega histórica. |
+
+| Identificador: RF-020 | Nombre: Actualización Interactiva de Cadena de Custodia en Base de Datos |
+| :--- | :--- |
+| **Tipo:** Necesario | **¿Crítico?** Sí \| **Prioridad:** Alta |
+| **Requerimiento que utiliza/especializa:** Endpoint `PUT /api/entregas/<id>/custodia`, RF-013 | **Documentos asociados:** `HistoricoModal.tsx` / `OperatorTerminalView.tsx` |
+| **Entrada:** Identificador o UUID de la entrega y nuevo estado (`depositado`, `recolectado`, `en_acopio`, `transformado`). | **Salida:** Registro actualizado en la tabla `entregas`, inserción de evento en `registro_auditoria` y confirmación JSON. |
+| **Descripción:** Permite avanzar o actualizar el paso de la cadena de custodia directamente desde el panel de detalle del Histórico BD o desde la terminal operativa, persistiendo el cambio en MySQL y registrando la trazabilidad en auditoría. |
+| **Manejo de situaciones anormales:** Si se envía un estado fuera del dominio permitido, el backend Python/Flask rechaza la petición con HTTP 400. |
+| **Criterios de aceptación:** Reflejo inmediato del nuevo estado en la interfaz y persistencia verificable en MySQL. |
+
+| Identificador: RF-021 | Nombre: Diagnóstico y Telemetría de Conexión a Base de Datos MySQL |
+| :--- | :--- |
+| **Tipo:** Necesario | **¿Crítico?** No \| **Prioridad:** Media |
+| **Requerimiento que utiliza/especializa:** Endpoint `GET /api/db/status` | **Documentos asociados:** `app.py` / `HistoricoModal.tsx` |
+| **Entrada:** Solicitud GET de verificación de estado. | **Salida:** Estado de conexión (`conectado`/`error`), motor (`MySQL / MariaDB en XAMPP`), listado de las 8 tablas activas y conteo de filas en vivo. |
+| **Descripción:** Expone el estado de salud de la base de datos relacional `ecocommunity_db` y el conteo en tiempo real de usuarios, puntos limpios, materiales, entregas, transacciones y recompensas. |
+| **Manejo de situaciones anormales:** Si el servicio MySQL de XAMPP está detenido, devuelve HTTP 500 con detalle diagnóstico del socket. |
+| **Criterios de aceptación:** Respuesta en menos de 500 ms con codificación UTF-8 (`utf8mb4`). |
+
+| Identificador: RF-022 | Nombre: Versionamiento y Migración de Esquema Relacional con Liquibase |
+| :--- | :--- |
+| **Tipo:** Necesario | **¿Crítico?** Sí \| **Prioridad:** Alta |
+| **Requerimiento que utiliza/especializa:** Modelo de datos relacional | **Documentos asociados:** `liquibase/db.changelog-master.xml`, `01-initial-schema-and-seed.xml` |
+| **Entrada:** Archivos de changelog XML/SQL y propiedades de conexión JDBC (`liquibase.properties`). | **Salida:** Creación reproducible y versionada de las 8 tablas relacionales, claves foráneas, índices y datos semilla (seed). |
+| **Descripción:** Gestiona de forma declarativa y auditable la evolución del esquema de base de datos `ecocommunity_db` mediante `changeSet` formalizados en Liquibase. |
+| **Manejo de situaciones anormales:** Si un cambio falla, Liquibase aborta la transacción del `changeSet` evitando esquemas corruptos. |
+| **Criterios de aceptación:** Existencia de changelog maestro XML, script SQL equivalente y compatibilidad con MariaDB/MySQL en XAMPP. |
+
+| Identificador: RF-023 | Nombre: Visualización Interactiva 3D de Telemetría Ambiental (Three.js / WebGL) |
+| :--- | :--- |
+| **Tipo:** Necesario | **¿Crítico?** No \| **Prioridad:** Media |
+| **Requerimiento que utiliza/especializa:** Interfaz principal Hero | **Documentos asociados:** `HeroThreeJS.tsx` / `DashboardView.tsx` |
+| **Entrada:** Métricas en vivo de billetera e interacción del cursor (puntero/táctil). | **Salida:** Escena 3D interactiva del planeta Tierra sostenido por manos humanas con órbitas holográficas, nubes dinámicas y partículas en WebGL. |
+| **Descripción:** Presenta en la portada principal una escena Three.js de alto rendimiento que combina el planeta Tierra hiperrealista sostenido por dos manos con anillos orbitales holográficos en tiempo real, pausándose automáticamente con `IntersectionObserver` cuando sale de pantalla. |
+| **Manejo de situaciones anormales:** Si el navegador no soporta WebGL, renderiza automáticamente el modo visual estático de respaldo sin bloquear la aplicación. |
+| **Criterios de aceptación:** Fluidez a 60 FPS con límite de `devicePixelRatio` y botones directos hacia los módulos del sistema. |
+
+| Identificador: RF-024 | Nombre: Portal Operativo Privado para Recolectores Urbanos |
+| :--- | :--- |
+| **Tipo:** Necesario | **¿Crítico?** No \| **Prioridad:** Media |
+| **Requerimiento que utiliza/especializa:** RF-001, RF-013 | **Documentos asociados:** `CollectorPrivateWeb.tsx` |
+| **Entrada:** Sesión con rol `recolector` y selección de ruta/punto limpio. | **Salida:** Hoja de ruta con nivel de llenado de contenedores, registro de recolección en campo y cambio de custodia a `recolectado`. |
+| **Descripción:** Provee a los recicladores de oficio un tablero dedicado para priorizar contenedores próximos al límite de capacidad y certificar el retiro de lotes. |
+| **Manejo de situaciones anormales:** Impide confirmar recolección de contenedores sin entregas pendientes. |
+| **Criterios de aceptación:** Actualización sincronizada del estado de lote y visualización de alertas de capacidad. |
+
+| Identificador: RF-025 | Nombre: Portal Operativo para Centros de Acopio y Pesaje Industrial |
+| :--- | :--- |
+| **Tipo:** Necesario | **¿Crítico?** No \| **Prioridad:** Media |
+| **Requerimiento que utiliza/especializa:** RF-001, RF-013 | **Documentos asociados:** `DropoffCenterPrivateWeb.tsx` / `OperatorTerminalView.tsx` |
+| **Entrada:** Sesión con rol `punto_acopio`, lote recibido y validación de báscula. | **Salida:** Recepción de material consolidado y transición de custodia a `en_acopio` o `transformado`. |
+| **Descripción:** Permite a las plantas y estaciones de acopio verificar los lotes entregados por ciudadanos o recolectores y certificar su ingreso a procesos de transformación industrial. |
+| **Manejo de situaciones anormales:** Rechazo de lotes con discrepancias críticas de pureza o contaminación. |
+| **Criterios de aceptación:** Trazabilidad completa vinculada al hash criptográfico original de cada entrega. |
+
+| Identificador: RF-026 | Nombre: Portal Privado de Marcas Aliadas y Patrocinio ESG |
+| :--- | :--- |
+| **Tipo:** Necesario | **¿Crítico?** No \| **Prioridad:** Media |
+| **Requerimiento que utiliza/especializa:** RF-001, RF-012, RF-014 | **Documentos asociados:** `BrandPrivateWeb.tsx` |
+| **Entrada:** Sesión con rol `marca_aliada`. | **Salida:** Métricas de redención de cupones de la marca, stock de recompensas activas y certificado de huella de carbono compensada. |
+| **Descripción:** Ofrece a las empresas patrocinadoras visibilidad transparente del retorno ambiental y social de sus campañas de fidelización en Ecocoins. |
+| **Manejo de situaciones anormales:** Alerta automática cuando el inventario de un cupón patrocinado es inferior a 5 unidades. |
+| **Criterios de aceptación:** Desglose de impacto ambiental atribuible a los empaques recuperados. |
+
+| Identificador: RF-027 | Nombre: Integración Telemática con Sensores IoT de Contenedores (Etapa 3) |
+| :--- | :--- |
+| **Tipo:** Deseable (Proyección Etapa 3) | **¿Crítico?** No \| **Prioridad:** Baja |
+| **Requerimiento que utiliza/especializa:** RF-017 | **Documentos asociados:** Especificación IoT Etapa 3 |
+| **Entrada:** Tramas JSON de telemetría (ultrasonido de llenado y celda de carga) desde el contenedor inteligente. | **Salida:** Actualización automática de `capacidad_actual_kg` y disparo de orden de recolección al superar el 85%. |
+| **Descripción:** Permite que los contenedores físicos dotados de microcontroladores reporten de manera autónoma su nivel de llenado en tiempo real hacia el backend Python/Flask. |
+| **Manejo de situaciones anormales:** Pérdida de señal del sensor mayor a 6 horas genera alerta de mantenimiento técnico. |
+| **Criterios de aceptación:** Actualización sin intervención manual del porcentaje de ocupación en el mapa ciudadano y panel admin. |
+
+| Identificador: RF-028 | Nombre: Exportación y Certificación de Bonos de Carbono Auditables (Etapa 3) |
+| :--- | :--- |
+| **Tipo:** Deseable (Proyección Etapa 3) | **¿Crítico?** No \| **Prioridad:** Baja |
+| **Requerimiento que utiliza/especializa:** RF-014 | **Documentos asociados:** `ESGReportView.tsx` |
+| **Entrada:** Rango de auditoría y lotes en estado `transformado`. | **Salida:** Manifiesto estructurado con hashes criptográficos verificables para entidades certificadoras de carbono (ISO 14064). |
+| **Descripción:** Consolida los lotes cuyo ciclo de custodia llegó a `transformado` para respaldar la emisión de certificados de reducción de emisiones de $CO_2$. |
+| **Manejo de situaciones anormales:** Excluye automáticamente del manifiesto cualquier entrega que aún no haya alcanzado el estado `transformado`. |
+| **Criterios de aceptación:** Integridad del 100% de los hashes incluidos en el reporte exportado. |
 
 ---
 
@@ -489,44 +586,44 @@ flowchart TD
 | ECOCOMMUNITY | Código: RNF-001 | Nombre: Arquitectura Modular y Desacoplada | Prioridad: Alta |
 | :--- | :--- | :--- | :--- |
 | **Objetivo:** | Garantizar la escalabilidad, mantenibilidad y separación clara de responsabilidades en el código fuente. |
-| **Especificación Técnica:** | El sistema deberá estructurarse separando estrictamente la capa de presentación (React SPA), la capa de enrutamiento y servicios de negocio (Express API) y los adaptadores de integración externa (Gemini AI SDK y base de datos relacional). |
-| **Restricciones:** | El frontend y backend deben comunicarse únicamente a través de contratos de API RESTful en formato JSON. |
+| **Especificación Técnica:** | El sistema deberá estructurarse separando estrictamente la capa de presentación (React 19 SPA + Three.js WebGL), la capa de servicios de negocio y API REST en **Python 3.12 / Flask** (`app.py`, con servidor Node/Express como contingencia) y la capa de persistencia relacional en **MySQL / MariaDB (XAMPP)** gestionada con **Liquibase**. |
+| **Restricciones:** | El frontend y backend deben comunicarse únicamente a través de contratos de API RESTful en formato JSON con codificación `utf8mb4`. |
 
 | ECOCOMMUNITY | Código: RNF-002 | Nombre: Tiempo de Respuesta de Clasificación y APIs | Prioridad: Alta |
 | :--- | :--- | :--- | :--- |
 | **Objetivo:** | Brindar una experiencia de usuario fluida y evitar abandonos durante el proceso de depósito en contenedor. |
-| **Especificación Técnica:** | 1. Las consultas locales de catálogo por código de barras y geolocalización deberán responder en un tiempo $\le 1.5$ segundos en el 95% de los casos.<br>2. La inferencia visual con Gemini AI no deberá exceder los 4.0 segundos bajo condiciones normales de red. |
+| **Especificación Técnica:** | 1. Las consultas locales de catálogo en MySQL por código de barras y geolocalización deberán responder en un tiempo $\le 1.5$ segundos en el 95% de los casos.<br>2. La inferencia visual con Gemini AI no deberá exceder los 4.0 segundos bajo condiciones normales de red. |
 | **Restricciones:** | Sujeto a la latencia de conectividad del operador celular del usuario final. |
 
 | ECOCOMMUNITY | Código: RNF-003 | Nombre: Tolerancia a Fallos e Integración Heurística de Respaldo | Prioridad: Alta |
 | :--- | :--- | :--- | :--- |
 | **Objetivo:** | Mantener la disponibilidad operativa del escáner aún ante caídas del proveedor de IA en la nube. |
-| **Especificación Técnica:** | En caso de timeout, error 5xx o agotamiento de cuota de la API de Google Gemini, el backend deberá activar automáticamente el adaptador determinista local de contingencia sin arrojar un error bloqueante al cliente. |
+| **Especificación Técnica:** | En caso de timeout, error 5xx o agotamiento de cuota de la API de Google Gemini, el backend Python/Flask deberá activar automáticamente el adaptador determinista local de contingencia sin arrojar un error bloqueante al cliente. |
 | **Restricciones:** | La clasificación de contingencia proporcionará estimaciones estándar basadas en categorías frecuentes. |
 
 | ECOCOMMUNITY | Código: RNF-004 | Nombre: Seguridad y Protección de Datos Personales | Prioridad: Alta |
 | :--- | :--- | :--- | :--- |
 | **Objetivo:** | Cumplir estrictamente la legislación colombiana (Ley 1581 de 2012) respecto a datos de usuarios y ubicación. |
-| **Especificación Técnica:** | Las coordenadas GPS de los usuarios solo se procesarán en memoria para validar la regla de geofencing y no se utilizarán para rastreo continuo. Las contraseñas se almacenarán mediante funciones de derivación criptográfica (hash robusto). |
+| **Especificación Técnica:** | Las coordenadas GPS de los usuarios solo se procesarán para validar la regla de geofencing y auditar el depósito puntual, sin realizar rastreo continuo. Las contraseñas se almacenarán mediante funciones de derivación criptográfica (`password_hash`). |
 | **Restricciones:** | Se requiere aceptación explícita de la política de tratamiento de datos durante el registro. |
 
 | ECOCOMMUNITY | Código: RNF-005 | Nombre: Diseño Responsivo y Compatibilidad Multiplataforma | Prioridad: Alta |
 | :--- | :--- | :--- | :--- |
 | **Objetivo:** | Garantizar visualización y operatividad óptima en cualquier dispositivo móvil o de escritorio. |
-| **Especificación Técnica:** | La interfaz web debe implementar diseño responsivo fluido (Mobile-First) garantizando usabilidad completa en resoluciones desde 360x640 px (smartphones) hasta 1920x1080 px (escritorio), compatible con Chrome, Edge, Firefox y Safari. |
-| **Restricciones:** | No se garantiza compatibilidad con navegadores obsoletos que carezcan de soporte para ECMAScript 2022 o Web APIs modernas. |
+| **Especificación Técnica:** | La interfaz web debe implementar diseño responsivo fluido garantizando usabilidad completa en resoluciones desde 360x640 px (smartphones) hasta 1920x1080 px (escritorio 16:9), con degradación elegante si WebGL no está disponible. |
+| **Restricciones:** | No se garantiza compatibilidad con navegadores obsoletos que carezcan de soporte para ECMAScript 2022. |
 
 | ECOCOMMUNITY | Código: RNF-006 | Nombre: Disponibilidad del Servicio | Prioridad: Alta |
 | :--- | :--- | :--- | :--- |
 | **Objetivo:** | Asegurar que los contenedores inteligentes y el sistema de canje estén disponibles en horarios continuos. |
 | **Especificación Técnica:** | La plataforma deberá mantener una tasa de disponibilidad mínima del 99.2% mensual, exceptuando ventanas de mantenimiento preventivo notificadas con antelación. |
-| **Restricciones:** | Dependencia de la infraestructura de alojamiento en la nube seleccionada. |
+| **Restricciones:** | Dependencia de la infraestructura de alojamiento y del motor de base de datos MySQL. |
 
 | ECOCOMMUNITY | Código: RNF-007 | Nombre: Integridad Criptográfica de la Cadena de Custodia | Prioridad: Alta |
 | :--- | :--- | :--- | :--- |
 | **Objetivo:** | Prevenir la falsificación de recibos de reciclaje y garantizar reportes ESG auditables. |
-| **Especificación Técnica:** | Cada recibo digital generado deberá contener un hash hexadecimal único calculado a partir del ID de entrega, usuario, punto limpio, peso y timestamp, de modo que cualquier alteración en base de datos sea detectable. |
-| **Restricciones:** | El algoritmo de generación debe ser determinista o pseudoaleatorio criptográficamente seguro. |
+| **Especificación Técnica:** | Cada recibo digital generado deberá contener un hash hexadecimal único SHA-256 recortado (`0x...`) calculado a partir de la entrega, usuario, punto limpio, peso y timestamp, almacenado con restricción `UNIQUE` en MySQL. |
+| **Restricciones:** | El algoritmo de generación debe ser criptográficamente seguro. |
 
 | ECOCOMMUNITY | Código: RNF-008 | Nombre: Capacidad y Concurrencia | Prioridad: Media |
 | :--- | :--- | :--- | :--- |
@@ -540,11 +637,11 @@ flowchart TD
 | **Especificación Técnica:** | Contrastes cromáticos según directrices WCAG 2.1 nivel AA, iconografía explicativa en cada material y textos de ayuda en lenguaje claro y accesible. |
 | **Restricciones:** | Dependiente del diseño visual estandarizado en componentes UI. |
 
-| ECOCOMMUNITY | Código: RNF-010 | Nombre: Mantenibilidad y Trazabilidad del Código Fuente | Prioridad: Media |
+| ECOCOMMUNITY | Código: RNF-010 | Nombre: Mantenibilidad, Pruebas Automatizadas y Control de Versiones | Prioridad: Media |
 | :--- | :--- | :--- | :--- |
-| **Objetivo:** | Asegurar la evolución sostenible del software por futuros equipos de desarrollo. |
-| **Especificación Técnica:** | Uso estricto de TypeScript en todo el proyecto, tipado estático riguroso sin uso de `any` injustificado y control de versiones mediante Git con mensajes convencionales (*Conventional Commits*). |
-| **Restricciones:** | Cumplimiento del linter y verificación de compilación sin errores (`tsc --noEmit`). |
+| **Objetivo:** | Asegurar la evolución sostenible del software y la calidad verificada antes de pasar a producción. |
+| **Especificación Técnica:** | Uso de Python 3.12 tipado y estructurado en backend (`unittest` en `tests/test_python_mysql.py`), TypeScript estricto en frontend (`tsc --noEmit`), migraciones de base de datos en Liquibase y flujo Git por ramas (`dev` $\rightarrow$ `qa` $\rightarrow$ `main`). |
+| **Restricciones:** | Ningún cambio puede fusionarse a `main` sin aprobar la suite de pruebas en la rama `qa`. |
 
 ---
 
@@ -568,7 +665,7 @@ flowchart LR
         CU04[CU-04 Registrar Depósito con QR y Geofencing]
         CU05[CU-05 Consultar Billetera de Ecocoins]
         CU06[CU-06 Canjear Recompensa y Generar Voucher]
-        CU07[CU-07 Actualizar Cadena de Custodia]
+        CU07[CU-07 Actualizar Cadena de Custodia e Histórico BD]
         CU08[CU-08 Consultar Métricas y Reportes ESG]
         CU09[CU-09 Gestionar Puntos Limpios y Auditoría]
     end
@@ -590,6 +687,7 @@ flowchart LR
     Marca --> CU08
 
     Admin --> CU01
+    Admin --> CU07
     Admin --> CU08
     Admin --> CU09
 ```
@@ -612,7 +710,7 @@ flowchart LR
 | :--- | :--- |
 | **Descripción:** | El ciudadano escanea un código de barras o captura una foto del residuo para obtener la categoría, instrucciones de separación y puntos calculados. |
 | **Precondición:** | El dispositivo debe contar con cámara funcional o entrada de texto para código de barras. |
-| **Secuencia Normal:** | 1. El usuario selecciona la herramienta de Escáner.<br>2. El usuario ingresa código de barras o toma una foto del empaque.<br>3. Si hay código, el sistema consulta el catálogo interno; si es foto, invoca a Gemini AI.<br>4. El sistema valida el esquema estructurado devuelto.<br>5. El sistema presenta la tarjeta de clasificación con nombre, categoría, peso, puntos, ahorro de $CO_2$ y guía de limpieza.<br>6. El usuario pulsa "Confirmar y Proceder al Depósito". |
+| **Secuencia Normal:** | 1. El usuario selecciona la herramienta de Escáner.<br>2. El usuario ingresa código de barras o toma una foto del empaque.<br>3. Si hay código, el backend Python/Flask consulta la tabla `materiales` en MySQL; si es foto, invoca a Gemini AI.<br>4. El sistema valida el esquema estructurado devuelto.<br>5. El sistema presenta la tarjeta de clasificación con nombre, categoría, peso, puntos, ahorro de $CO_2$ y guía de limpieza.<br>6. El usuario pulsa "Confirmar y Proceder al Depósito". |
 | **Postcondición:** | Los datos del material quedan preparados en memoria para asociarse al depósito físico. |
 | **Excepciones:** | **Paso 3:** Si la API de Gemini falla por timeout o cuota, se activa automáticamente el adaptador heurístico local de contingencia.<br>**Paso 4:** Si el objeto es clasificado como "No reciclable", el sistema inhabilita el botón de depósito y muestra guía de disposición final. |
 
@@ -620,7 +718,7 @@ flowchart LR
 | :--- | :--- |
 | **Descripción:** | El usuario visualiza los puntos limpios en el mapa y comprueba su distancia respecto a ellos. |
 | **Precondición:** | El dispositivo debe tener habilitado el servicio de geolocalización. |
-| **Secuencia Normal:** | 1. El usuario ingresa a la pestaña "Puntos Limpios".<br>2. El sistema obtiene las coordenadas de latitud y longitud del dispositivo.<br>3. El sistema calcula la distancia con cada punto registrado mediante la fórmula de Haversine.<br>4. El sistema ordena la lista de menor a mayor distancia.<br>5. El sistema resalta si el usuario se encuentra a $\le 20$ metros del contenedor seleccionado.<br>6. El usuario visualiza la dirección, horarios y tipos de materiales recibidos. |
+| **Secuencia Normal:** | 1. El usuario ingresa a la pestaña "Puntos Limpios".<br>2. El sistema obtiene las coordenadas de latitud y longitud del dispositivo.<br>3. El backend Python/Flask consulta `puntos_limpios` en MySQL y calcula la distancia mediante la fórmula de Haversine.<br>4. El sistema ordena la lista de menor a mayor distancia.<br>5. El sistema resalta si el usuario se encuentra a $\le 20$ metros del contenedor seleccionado.<br>6. El usuario visualiza la dirección, horarios y tipos de materiales recibidos. |
 | **Postcondición:** | El usuario identifica el contenedor adecuado para realizar su entrega física. |
 | **Excepciones:** | **Paso 2:** Si el usuario rechaza los permisos de ubicación, el sistema muestra la lista general advirtiendo que no es posible verificar la cercanía de geofencing. |
 
@@ -628,46 +726,71 @@ flowchart LR
 | :--- | :--- |
 | **Descripción:** | El ciudadano deposita el residuo clasificado en el contenedor, escanea el código QR del punto y recibe sus Ecocoins. |
 | **Precondición:** | El usuario debe haber clasificado previamente el material (CU-02) y encontrarse físicamente frente al contenedor. |
-| **Secuencia Normal:** | 1. El usuario selecciona el punto limpio y abre el escáner QR de confirmación.<br>2. El usuario escanea el código QR pegado físicamente en el contenedor.<br>3. El sistema captura las coordenadas GPS actuales y el hash QR.<br>4. El servidor valida que el código QR coincida con el del punto registrado.<br>5. El servidor comprueba que la distancia calculada sea $\le 20$ metros.<br>6. El servidor valida que no exista un depósito idéntico del mismo usuario en las últimas 24 horas.<br>7. El servidor registra la entrega en base de datos e incrementa el saldo de Ecocoins.<br>8. El sistema muestra el modal con el Recibo Digital Criptográfico y lanza animación festiva. |
-| **Postcondición:** | La entrega queda registrada en estado `depositado`, el recibo digital queda creado y el saldo de la billetera se actualiza. |
+| **Secuencia Normal:** | 1. El usuario selecciona el punto limpio y abre el escáner QR de confirmación.<br>2. El usuario escanea el código QR pegado físicamente en el contenedor.<br>3. El sistema captura las coordenadas GPS actuales y el hash QR.<br>4. El servidor Python/Flask valida en MySQL que el código QR coincida con el del punto registrado.<br>5. El servidor comprueba que la distancia calculada sea $\le 20$ metros.<br>6. El servidor valida en la tabla `entregas` que no exista un depósito idéntico del mismo usuario en las últimas 24 horas.<br>7. El servidor inserta la entrega y la transacción crediticia en MySQL e incrementa la capacidad del contenedor.<br>8. El sistema muestra el modal con el Recibo Digital Criptográfico y lanza animación festiva. |
+| **Postcondición:** | La entrega queda registrada en MySQL en estado `depositado`, el recibo digital queda creado y el saldo de la billetera se actualiza. |
 | **Excepciones:** | **Paso 4:** Si el QR no coincide, arroja error 400 y solicita reintentar.<br>**Paso 5:** Si la distancia excede los 20 m, arroja error 403 (*Geofencing fallido*) indicando la distancia actual.<br>**Paso 6:** Si ya depositó ese ítem en 24h, arroja error 429 (*Antifraude activado*) y cancela la transacción. |
 
-| CU-05 | CANJEAR RECOMPENSA DE MARCA ALIADA |
+| CU-05 | CONSULTAR BILLETERA DE ECOCOINS Y MÉTRICAS DE IMPACTO |
+| :--- | :--- |
+| **Descripción:** | El ciudadano consulta su saldo consolidado de Ecocoins, su rango ecológico, historial de movimientos y estadísticas de impacto ambiental. |
+| **Precondición:** | El usuario debe contar con sesión activa en la plataforma. |
+| **Secuencia Normal:** | 1. El usuario accede a la sección "Billetera" o visualiza las tarjetas de resumen en el Hero.<br>2. El cliente invoca `GET /api/user/wallet` en el servidor Python/Flask.<br>3. El servidor calcula en MySQL el balance entre transacciones de tipo `credito` y `debito_canje`, así como la suma de kg reciclados y $CO_2$ ahorrado.<br>4. El sistema determina el rango del usuario (`Novicio Verde`, `Reciclador Activo` o `Guardián Circular`) y presenta los movimientos cronológicos. |
+| **Postcondición:** | El usuario visualiza su estado financiero circular y su contribución ecológica verificada. |
+| **Excepciones:** | **Paso 3:** Si el usuario aún no registra entregas, el sistema muestra saldo 0 EC con invitación a realizar su primer escaneo. |
+
+| CU-06 | CANJEAR RECOMPENSA DE MARCA ALIADA |
 | :--- | :--- |
 | **Descripción:** | El ciudadano utiliza su saldo acumulado de Ecocoins para adquirir un cupón de descuento o producto en marcas colaboradoras. |
-| **Precondición:** | El usuario debe contar con un saldo de Ecocoins mayor o igual al valor del premio seleccionado y existir stock disponible. |
-| **Secuencia Normal:** | 1. El usuario abre la sección de "Billetera" y consulta el catálogo de recompensas.<br>2. El usuario selecciona la recompensa de su interés.<br>3. El usuario pulsa el botón "Canjear Recompensa".<br>4. El sistema valida en el servidor el saldo disponible y la existencia en stock.<br>5. El sistema debita las Ecocoins correspondientes.<br>6. El sistema descuenta 1 unidad del inventario de la recompensa.<br>7. El sistema genera un código voucher único (ej. `ECO-CAFE-9284-GR`) con vigencia de 30 días.<br>8. El sistema muestra en pantalla el cupón listo para ser presentado en el comercio. |
-| **Postcondición:** | El saldo de Ecocoins se reduce, el voucher queda registrado en el historial de transacciones y el stock de la marca aliada se actualiza. |
-| **Excepciones:** | **Paso 4:** Si el saldo es insuficiente o el stock es 0, el sistema rechaza la operación e informa la cantidad de monedas requeridas. |
+| **Precondición:** | El usuario debe contar con un saldo de Ecocoins mayor o igual al valor del premio seleccionado y existir stock disponible en la tabla `recompensas`. |
+| **Secuencia Normal:** | 1. El usuario abre la sección de "Billetera" y consulta el catálogo de recompensas.<br>2. El usuario selecciona la recompensa de su interés y pulsa "Canjear Recompensa".<br>3. El servidor Python/Flask valida en MySQL el saldo disponible y la existencia en stock.<br>4. El servidor inserta una transacción `debito_canje` y descuenta 1 unidad del inventario.<br>5. El servidor genera un código voucher único (ej. `ECO-CAFE-9284-GR`) con vigencia de 30 días.<br>6. El sistema muestra en pantalla el cupón listo para ser presentado en el comercio. |
+| **Postcondición:** | El saldo de Ecocoins se reduce, el voucher queda registrado en `transacciones` y el stock de la marca aliada se actualiza en MySQL. |
+| **Excepciones:** | **Paso 3:** Si el saldo es insuficiente o el stock es 0, el sistema rechaza la operación con HTTP 400 e informa la cantidad de monedas requeridas. |
 
-| CU-06 | ACTUALIZAR CADENA DE CUSTODIA (RECOLECTOR / ACOPIO) |
+| CU-07 | ACTUALIZAR CADENA DE CUSTODIA E INTERACTUAR CON EL HISTÓRICO BD |
 | :--- | :--- |
-| **Descripción:** | El recolector urbano o el operador del centro de acopio registra el cambio de estado de un lote de residuos entregado. |
-| **Precondición:** | El usuario debe estar autenticado con rol `recolector`, `punto_acopio` o `admin`. |
-| **Secuencia Normal:** | 1. El operador ingresa a su portal operativo privado.<br>2. Consulta el listado de entregas y lotes en tránsito.<br>3. Selecciona el identificador de entrega o escanea el hash del recibo.<br>4. Selecciona el nuevo estado (`recolectado`, `en_acopio` o `transformado`).<br>5. El sistema valida que la transición sea consecutiva y coherente.<br>6. El sistema actualiza el registro en la base de datos y asocia la firma/identificador del operador. |
-| **Postcondición:** | La trazabilidad de la entrega queda actualizada para consulta pública en reportes ESG. |
-| **Excepciones:** | **Paso 5:** Si se intenta una transición no válida, el sistema muestra advertencia de inconsistencia en la cadena de custodia. |
+| **Descripción:** | El operador (recolector, centro de acopio o administrador) consulta el Histórico BD de entregas en MySQL y actualiza el estado de la cadena de custodia de un lote. |
+| **Precondición:** | Existir entregas registradas en la tabla `entregas` de `ecocommunity_db`. |
+| **Secuencia Normal:** | 1. El usuario abre el modal "Histórico BD" desde la barra superior o ingresa a la terminal operativa.<br>2. El sistema consulta `GET /api/entregas/history` y `/api/db/status`, mostrando el estado de conexión MySQL XAMPP y la lista filtrable de entregas.<br>3. El operador selecciona una entrega para inspeccionar su hash criptográfico, coordenadas y paso actual de custodia.<br>4. El operador selecciona el nuevo estado (`recolectado`, `en_acopio` o `transformado`).<br>5. El cliente envía `PUT /api/entregas/<id>/custodia` al servidor Python/Flask.<br>6. El servidor actualiza la fila en MySQL, registra la acción en `registro_auditoria` y refresca la vista en tiempo real. |
+| **Postcondición:** | La cadena de custodia de la entrega queda actualizada en MySQL y disponible para auditoría ESG. |
+| **Excepciones:** | **Paso 5:** Si el estado solicitado es inválido o la entrega no existe, el servidor responde con código 400/404 y conserva el estado anterior. |
+
+| CU-08 | CONSULTAR MÉTRICAS Y REPORTES ESG CONSOLIDADOS |
+| :--- | :--- |
+| **Descripción:** | La marca aliada, el supervisor ambiental o el ciudadano consulta el reporte global de sostenibilidad, desglose por materiales y cumplimiento ISO 14001. |
+| **Precondición:** | El servidor Python/Flask y la base de datos MySQL deben estar operativos. |
+| **Secuencia Normal:** | 1. El usuario navega a la vista "Impacto ESG".<br>2. El cliente solicita `GET /api/esg/report`.<br>3. El servidor agrega desde MySQL el peso total reciclado, $CO_2$ total mitigado, litros de agua ahorrados, desglose por categoría (`Plástico PET`, `Cartón y Papel`, `Aluminio / Latas`, `Vidrio`, etc.) y entregas auditadas.<br>4. La interfaz renderiza los indicadores clave, gráficos comparativos y tabla de certificados con su hash criptográfico. |
+| **Postcondición:** | El actor obtiene información auditable en tiempo real para reportes de Responsabilidad Extendida del Productor (REP). |
+| **Excepciones:** | **Paso 3:** Si no existen entregas para un filtro específico, se presentan métricas en cero sin interrumpir la visualización. |
+
+| CU-09 | GESTIONAR PUNTOS LIMPIOS, CAPACIDAD Y AUDITORÍA DEL SISTEMA |
+| :--- | :--- |
+| **Descripción:** | El administrador supervisa el nivel de ocupación de los puntos limpios, audita el registro de eventos de seguridad y verifica la integridad de la base de datos. |
+| **Precondición:** | El usuario debe encontrarse en el Portal Administrativo o de supervisión. |
+| **Secuencia Normal:** | 1. El administrador accede al Portal Admin.<br>2. El sistema presenta el listado de puntos limpios con su relación `capacidad_actual_kg / capacidad_max_kg` y estado operativo.<br>3. El sistema resalta alertas preventivas en contenedores que superan el 85% de ocupación.<br>4. El administrador consulta los eventos de `registro_auditoria` y el estado de las tablas MySQL. |
+| **Postcondición:** | El administrador mantiene el control operativo de la red de contenedores y la trazabilidad de seguridad. |
+| **Excepciones:** | **Paso 3:** Ante intentos repetidos de fraude o geofencing fallido, el registro queda marcado para revisión administrativa. |
 
 ---
 
 ## 5. Modelo conceptual consolidado y corregido
 
 ### 5.1. Decisiones de corrección del modelo
-- **Unificación de Identidad por Roles:** En lugar de crear tablas separadas para cada actor, se implementa una entidad central `Usuario` vinculada a `Rol`, gestionando los atributos específicos de empresa mediante la entidad extensible `PerfilUsuario` o el campo `entidad`.
-- **Doble Coordenada Satelital:** Se independiza la ubicación física estática del `PuntoLimpio` de las coordenadas dinámicas capturadas en el momento exacto del depósito (`latitud_registro`, `longitud_registro` en `Entrega`), permitiendo auditar discrepancias de geofencing.
+- **Unificación de Identidad por Roles:** En lugar de crear tablas separadas para cada actor, se implementa una entidad central `usuarios` vinculada a `roles`, gestionando los atributos específicos de empresa mediante el campo `entidad`.
+- **Doble Coordenada Satelital:** Se independiza la ubicación física estática del `puntos_limpios` de las coordenadas dinámicas capturadas en el momento exacto del depósito (`latitud_registro`, `longitud_registro` en `entregas`), permitiendo auditar discrepancias de geofencing.
 - **Inmutabilidad y Hash de Recibos:** Cada entrega genera un atributo `recibo_digital_hash` único que amarra el registro transaccional y previene modificaciones no autorizadas en auditorías ESG.
-- **Trazabilidad de Cadena de Custodia:** La entidad `Entrega` contiene el ciclo de vida secuencial del material mediante la enumeración `cadena_custodia_paso` (`depositado`, `recolectado`, `en_acopio`, `transformado`).
-- **Separación de Puntos y Vouchers:** La entidad `Transaccion` gestiona tanto los créditos (acumulación por reciclaje) como los débitos (canje), emitiendo el código de cupón asociado en el campo `codigo_voucher`.
+- **Trazabilidad de Cadena de Custodia:** La entidad `entregas` contiene el ciclo de vida secuencial del material mediante `cadena_custodia_paso` (`depositado`, `recolectado`, `en_acopio`, `transformado`).
+- **Separación de Puntos y Vouchers:** La entidad `transacciones` gestiona tanto los créditos (acumulación por reciclaje) como los débitos (canje), emitiendo el código de cupón asociado en el campo `codigo_voucher`.
+- **Control de Migraciones con Liquibase:** Todo el esquema DDL y la carga semilla están controlados bajo `liquibase/db.changelog-master.xml`.
 
-### 5.2. Entidades y atributos de referencia
-- **Rol:** `id_rol` (PK), `nombre`, `descripcion`.
-- **Usuario:** `id_usuario` (PK), `id_rol` (FK $\rightarrow$ Rol), `nombre`, `email`, `password_hash`, `entidad` (opcional), `estado`, `fecha_registro`.
-- **Material:** `id_material` (PK), `codigo_barras` (opcional, indexado), `nombre`, `categoria`, `puntos_por_kg`, `co2_factor`, `instrucciones_reciclaje`.
-- **PuntoLimpio:** `id_punto` (PK), `nombre`, `direccion`, `latitud`, `longitud`, `horario`, `capacidad_max_kg`, `capacidad_actual_kg`, `activo`, `codigo_qr_hash`, `tipo`, `materiales_aceptados`.
-- **Entrega:** `id_entrega` (PK), `uuid` (UNIQUE), `id_usuario` (FK $\rightarrow$ Usuario), `id_punto` (FK $\rightarrow$ PuntoLimpio), `material_nombre`, `categoria`, `peso_kg`, `puntos_otorgados`, `co2_ahorrado_kg`, `estado`, `latitud_registro`, `longitud_registro`, `distancia_metros`, `qr_hash`, `fecha_entrega`, `cadena_custodia_paso`, `recibo_digital_hash` (UNIQUE).
-- **Transaccion:** `id_transaccion` (PK), `id_usuario` (FK $\rightarrow$ Usuario), `tipo` (`credito` \| `debito_canje`), `monto_puntos`, `descripcion`, `fecha`, `codigo_voucher` (opcional).
-- **Recompensa:** `id_recompensa` (PK/string), `sponsor`, `titulo`, `costo_ecocoins`, `categoria`, `descripcion`, `stock`, `marca_aliada_id`, `logo_svg`.
-- **RegistroAuditoria:** `id_registro` (PK), `id_usuario` (FK $\rightarrow$ Usuario, opcional), `accion`, `entidad_afectada`, `id_entidad`, `fecha_hora`, `ip_origen`, `detalle`.
+### 5.2. Entidades y atributos de referencia (`ecocommunity_db`)
+- **roles:** `id_rol` (PK), `nombre`, `descripcion`.
+- **usuarios:** `id_usuario` (PK), `id_rol` (FK $\rightarrow$ roles), `nombre`, `email`, `password_hash`, `entidad` (opcional), `estado`, `fecha_registro`.
+- **materiales:** `id_material` (PK), `codigo_barras` (UNIQUE, indexado), `nombre`, `categoria`, `puntos_por_kg`, `co2_factor`, `instrucciones_reciclaje`.
+- **puntos_limpios:** `id_punto` (PK), `nombre`, `direccion`, `latitud`, `longitud`, `horario`, `capacidad_max_kg`, `capacidad_actual_kg`, `activo`, `codigo_qr_hash`, `tipo`, `materiales_aceptados`.
+- **entregas:** `id_entrega` (PK), `uuid` (UNIQUE), `id_usuario` (FK $\rightarrow$ usuarios), `id_punto` (FK $\rightarrow$ puntos_limpios), `material_nombre`, `categoria`, `peso_kg`, `puntos_otorgados`, `co2_ahorrado_kg`, `estado`, `latitud_registro`, `longitud_registro`, `distancia_metros`, `qr_hash`, `fecha_entrega`, `cadena_custodia_paso`, `recibo_digital_hash` (UNIQUE).
+- **transacciones:** `id_transaccion` (PK), `id_usuario` (FK $\rightarrow$ usuarios), `tipo` (`credito` \| `debito_canje`), `monto_puntos`, `descripcion`, `fecha`, `codigo_voucher` (opcional).
+- **recompensas:** `id_recompensa` (PK/VARCHAR), `sponsor`, `titulo`, `costo_ecocoins`, `categoria`, `descripcion`, `stock`, `marca_aliada_id`, `logo_svg`.
+- **registro_auditoria:** `id_registro` (PK), `id_usuario` (FK $\rightarrow$ usuarios, opcional), `accion`, `entidad_afectada`, `id_entidad`, `fecha_hora`, `ip_origen`, `detalle`.
 
 ### 5.3. Relaciones y cardinalidades consolidadas
 
@@ -687,7 +810,7 @@ flowchart LR
 3. **Regla Antifraude de Frecuencia (24h Cooldown):** Un mismo usuario no puede recibir puntos por entregar el mismo tipo de residuo en el mismo punto limpio más de una vez cada 24 horas.
 4. **Regla de No Reciclabilidad:** Los materiales detectados con la categoría `"No reciclable"` (ej. bolsas metalizadas, icopor sucio, etc.) no generarán abono de Ecocoins ni sumarán kg a las métricas de aprovechamiento.
 5. **Regla de Integridad de la Billetera:** No se permitirán saldos negativos. Ninguna transacción de canje procederá si el saldo de Ecocoins del usuario es menor al costo del beneficio.
-6. **Regla de Custodia Secuencial:** El estado de un residuo solo puede progresar en el orden: `depositado` $\rightarrow$ `recolectado` $\rightarrow$ `en_acopio` $\rightarrow$ `transformado`.
+6. **Regla de Custodia Secuencial:** El estado de un residuo progresa a través de los estados: `depositado` $\rightarrow$ `recolectado` $\rightarrow$ `en_acopio` $\rightarrow$ `transformado`.
 
 ---
 
@@ -697,21 +820,21 @@ La descomposición arquitectónica propuesta para la evolución modular de EcoCo
 
 | Dominio | Servicio Lógico | Responsabilidades Principales | Entidades que Gobierna | RF Asociados |
 | :--- | :--- | :--- | :--- | :--- |
-| **Identidad y Acceso** | `ms-identity` | Autenticación, gestión de sesiones, asignación de roles y control de accesos a portales. | Usuario, Rol, Sesion | RF-001, RF-002 |
+| **Identidad y Acceso** | `ms-identity` | Autenticación, gestión de sesiones, asignación de roles y control de accesos a portales. | Usuario, Rol, Sesion | RF-001, RF-002, RF-024 a RF-026 |
 | **Clasificación Circular** | `ms-classification` | Inferencia visual multimodal con Gemini AI, catálogo de códigos de barras y consejos de limpieza. | Material, Catálogo | RF-003, RF-004 |
-| **Red de Puntos Limpios** | `ms-locations` | Directorio geográfico, cálculo de distancias por Haversine, geofencing y control de capacidad. | PuntoLimpio | RF-005, RF-006, RF-017 |
-| **Depósito y Antifraude** | `ms-deposit` | Validación de códigos QR, control de frecuencias de 24 horas y emisión de recibos criptográficos. | Entrega, AntifraudeRegistry | RF-007 a RF-009 |
+| **Red de Puntos Limpios** | `ms-locations` | Directorio geográfico, cálculo de distancias por Haversine, geofencing, IoT y control de capacidad. | PuntoLimpio | RF-005, RF-006, RF-017, RF-027 |
+| **Depósito y Antifraude** | `ms-deposit` | Validación de códigos QR, control de frecuencias de 24 horas y emisión de recibos criptográficos. | Entrega, AntifraudeRegistry | RF-007 a RF-009, RF-015, RF-016 |
 | **Billetera e Incentivos** | `ms-wallet` | Registro de créditos/débitos, cálculo de saldo, inventario de recompensas y generación de vouchers. | Transaccion, Recompensa | RF-010 a RF-012 |
-| **Trazabilidad y ESG** | `ms-esg-traceability` | Cadena de custodia, cálculo de huella de carbono mitigada y generación de reportes ISO 14001. | Entrega (custodia), Certificados | RF-013, RF-014 |
-| **Auditoría y Supervisión** | `ms-audit` | Registro de logs transaccionales, trazabilidad de accesos y monitor de sobrellenado. | RegistroAuditoria | RF-018 |
+| **Trazabilidad, Histórico y ESG** | `ms-esg-traceability` | Cadena de custodia interactiva, Histórico MySQL, huella de carbono y reportes ISO 14001 / 14064. | Entrega (custodia), Certificados | RF-013, RF-014, RF-019, RF-020, RF-028 |
+| **Auditoría y Base de Datos** | `ms-audit-db` | Registro de logs transaccionales, telemetría MySQL y control de migraciones Liquibase. | RegistroAuditoria, DatabaseChangelog | RF-018, RF-021, RF-022 |
 
 ### 6.1. Funciones administrativas y transversales
-El panel administrativo no conforma un microservicio aislado; opera como un cliente con privilegios elevados que consume los endpoints autorizados de `ms-locations`, `ms-esg-traceability`, `ms-wallet` y `ms-audit`, asegurando centralización y consistencia en las reglas de negocio.
+El panel administrativo y el modal de Histórico BD operan consumiendo los endpoints de `ms-locations`, `ms-esg-traceability`, `ms-wallet` y `ms-audit-db`, asegurando centralización y consistencia en las reglas de negocio sobre MySQL.
 
 ### 6.2. Integración entre microservicios
-- **Comunicación Síncrona:** HTTP/REST con contratos en JSON para operaciones en tiempo real requeridas por el cliente (clasificación, validación de proximidad y canje).
+- **Comunicación Síncrona:** HTTP/REST con contratos en JSON para operaciones en tiempo real requeridas por el cliente (clasificación, validación de proximidad, actualización de custodia y canje).
 - **Mecanismos de Resiliencia:** Circuit Breaker y adaptadores de contingencia para llamadas a la API externa de Gemini.
-- **Sincronización Fuera de Línea:** Las peticiones encoladas en el navegador (`localStorage`) se transmiten secuencialmente a `ms-deposit` mediante reintentos con respaldo exponencial al restablecer la red.
+- **Sincronización Fuera de Línea:** Las peticiones encoladas en el navegador (`localStorage`) se transmiten secuencialmente a `ms-deposit` al restablecer la red.
 
 ---
 
@@ -719,36 +842,35 @@ El panel administrativo no conforma un microservicio aislado; opera como un clie
 
 | Patrón de Diseño | Aplicación Concreta en EcoCommunity |
 | :--- | :--- |
-| **Arquitectura por Capas** | Desacopla controladores Express, lógica de negocio y persistencia en backend; y componentes, custom hooks y vistas en React. |
-| **Adapter (Adaptador de IA)** | Encapsula la API de Gemini (`@google/genai`) y permite alternar sin impacto al fallback heurístico local determinista. |
-| **Repository** | Aísla el acceso y consultas a la base de datos de las entidades de catálogo, puntos limpios y transacciones. |
-| **DTO (Data Transfer Object)** | Estandariza la entrada y salida de datos en endpoints como `/api/ai/classify` y `/api/entregas/validate-and-deposit`. |
-| **Strategy** | Permite aplicar diferentes estrategias de clasificación según el dato de entrada: búsqueda exacta por código de barras o visión artificial. |
+| **Arquitectura por Capas** | Desacopla endpoints Python/Flask (`app.py`), lógica de negocio y persistencia PyMySQL en backend; y componentes, vistas y escena 3D Three.js en React. |
+| **Adapter (Adaptador de IA)** | Encapsula la API de Gemini (`google-genai`) y permite alternar sin impacto al fallback heurístico local determinista. |
+| **Database Migration (Liquibase)** | Versiona el esquema relacional y los datos semilla mediante changelogs declarativos (`db.changelog-master.xml`). |
+| **DTO (Data Transfer Object)** | Estandariza la entrada y salida de datos en endpoints como `/api/ai/classify`, `/api/entregas/validate-and-deposit` y `/api/entregas/history`. |
+| **Strategy** | Permite aplicar diferentes estrategias de clasificación según el dato de entrada: búsqueda exacta por código de barras en MySQL o visión artificial. |
 | **Offline-First / Local Queue** | Almacena temporalmente acciones de usuario en almacenamiento web local cuando se interrumpe la conexión de red. |
-| **BFF (Backend for Frontend)** | El servidor Node/Express actúa como agregador de servicios y proveedor de seguridad para el cliente SPA. |
 
-### 7.1. Arquitectura objetivo simplificada
+### 7.1. Arquitectura objetivo implementada
 
 ```
 +-----------------------------------------------------------------------------------+
-|                        CAPA DE CLIENTE (React 19 / Tailwind / PWA)                 |
-|  [Portal Ciudadano]  [Portal Recolector]  [Portal Acopio]  [Portal Marca]  [Admin]|
+|            CAPA DE CLIENTE (React 19 / TypeScript / Tailwind / Three.js)           |
+|  [Hero 3D WebGL] [Histórico BD] [Portales: Ciudadano | Recolector | Acopio | Admin]|
 +------------------------------------------+----------------------------------------+
-                                           | HTTPS / JSON API
+                                           | HTTPS / JSON API (Proxy Vite -> :5000)
                                            v
 +-----------------------------------------------------------------------------------+
-|                     CAPA DE SERVICIOS Y ENRUTAMIENTO (Express)                     |
-|  - Middleware de Permisos y CORS     - Manejador de Sesiones y Auditoría           |
-|  - Rate Limiting y Antifraude        - Motor Geofencing (Fórmula de Haversine)    |
+|               CAPA DE SERVICIOS Y ENRUTAMIENTO PRINCIPAL (Python / Flask)          |
+|  - app.py (Puerto 5000)              - Auditoría y Telemetría (/api/db/status)    |
+|  - Antifraude 24h en MySQL           - Motor Geofencing (Fórmula de Haversine)    |
 +---------------------+--------------------+--------------------+-------------------+
                       |                    |                    |
         +-------------+      +-------------+      +-------------+
         v                    v                    v             v
 +---------------+    +---------------+    +---------------+  +---------------------+
-| Adapter IA    |    | Servicio      |    | Servicio      |  | Persistencia        |
-| - Gemini 3.8  |    | Depósito y    |    | Billetera y   |  | Base de Datos       |
-|   Flash       |    | Cadena de     |    | Recompensas   |  | Relacional          |
-| - Fallback    |    | Custodia      |    | Ecocoins      |  | (Postgres/MySQL)    |
+| Adapter IA    |    | Servicio      |    | Servicio      |  | Persistencia MySQL  |
+| - Gemini AI   |    | Depósito,     |    | Billetera y   |  | - XAMPP MariaDB     |
+|   (google-    |    | Histórico y   |    | Recompensas   |  |   (ecocommunity_db) |
+|    genai)     |    | Custodia      |    | Ecocoins      |  | - Liquibase XML/SQL |
 +---------------+    +---------------+    +---------------+  +---------------------+
 ```
 
@@ -759,15 +881,15 @@ El panel administrativo no conforma un microservicio aislado; opera como un clie
 Para mantener la viabilidad formativa del proyecto y asegurar el cumplimiento de los estándares del tecnólogo ADSO, se fijan las siguientes delimitaciones:
 1. **Naturaleza del Incentivo:** Las **Ecocoins** son puntos de lealtad y gamificación comunitaria canjeables por cupones o productos de marcas aliadas; **no** constituyen moneda de curso legal, criptoactivos ni implican transferencias bancarias directas en esta versión del sistema.
 2. **Alcance de la Inteligencia Artificial:** El modelo Gemini Vision actúa como asistente orientador de clasificación ciudadana en la fuente; la validación final del pesaje masivo y pureza de los lotes recae en los recicladores urbanos y centros de acopio en la cadena de custodia.
-3. **Plataformas de Despliegue:** En la fase actual, el producto se consolida como una aplicación web responsiva (PWA Ready) ejecutable en cualquier navegador de smartphone o PC; la construcción de la APK nativa Android se proyecta para la Etapa 3.
+3. **Plataformas de Despliegue:** En la fase actual, el producto se consolida como una aplicación web responsiva (PWA Ready) con backend en Python/Flask y base de datos MySQL en XAMPP; la construcción de la APK nativa Android se proyecta para la Etapa 3.
 4. **Delimitación de Geofencing:** El radio estricto de validación es de 20 metros; desviaciones causadas por degradación en la señal satelital GPS del dispositivo del usuario son notificadas mediante interfaz para reintentos.
 
 ---
 
 ## 9. Fuente de verdad para trabajos posteriores
 
-A partir de la aprobación de esta versión del documento:
-- Las especificaciones de los **Requerimientos Funcionales (RF-001 al RF-018)** y **No Funcionales (RNF-001 al RNF-010)** aquí detalladas constituyen el marco contractual de desarrollo y pruebas.
-- El modelo conceptual (Sección 5) y los contratos de API definidos en la Sección 3 prevalecerán ante cualquier divergencia de diseño o maquetación previa.
-- Todos los diagramas de secuencia, casos de uso expandidos, scripts de base de datos DDL y casos de prueba de QA que elabore el equipo deberán tomar como base los códigos y reglas de negocio descritos en este documento.
+A partir de la aprobación de esta versión 2.0 del documento elaborada por **Paula Valentina Vargas Andrade** bajo la supervisión del instructor **Javier Umberto Pinto**:
+- Las especificaciones de los **Requerimientos Funcionales (RF-001 al RF-028)** y **No Funcionales (RNF-001 al RNF-010)** aquí detalladas constituyen el marco contractual de desarrollo y pruebas.
+- El modelo conceptual y físico en MySQL (Sección 5), los changelogs de Liquibase y los contratos de API en Python/Flask definidos en la Sección 3 prevalecerán ante cualquier divergencia previa.
+- Todos los casos de prueba automatizados (`tests/test_python_mysql.py` y `tests/qa-test-suite.ts`) validan directamente los requerimientos aquí especificados.
 
