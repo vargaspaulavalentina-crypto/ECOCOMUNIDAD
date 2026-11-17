@@ -1,20 +1,36 @@
-# ESPECIFICACIÓN DE REQUISITOS DE SOFTWARE (SRS)
+<div align="center">
 
-**Multiplataforma Digital Inteligente de Reciclaje Ciudadano, Trazabilidad ESG y Economía Circular**  
-**ECOCOMMUNITY**
+# SERVICIO NACIONAL DE APRENDIZAJE – SENA
+### CENTRO DE LA INDUSTRIA, LA EMPRESA Y LOS SERVICIOS
+#### TECNÓLOGO EN ANÁLISIS Y DESARROLLO DE SOFTWARE (ADSO)
 
 ---
 
-**Autora del Proyecto:**  
-- **Paula Valentina Vargas Andrade** — *Líder de Proyecto, Analista de Requisitos, Diseñadora UI/UX y Desarrolladora Full-Stack (Python / Flask / React / MySQL)*  
+## ESPECIFICACIÓN DE REQUISITOS DE SOFTWARE (SRS)
+### PROYECTO #18: PLATAFORMA DE RECICLAJE COMUNITARIO
+# **ECOCOMMUNITY**
 
-**Instructor Técnico:**  
-- **Javier Umberto Pinto** — *Instructor Técnico SENA (Seguimiento y Evaluación de Ingeniería de Software)*  
+**Registro de Materiales Reciclables y Puntos de Recolección con Clasificación Orientativa mediante Inteligencia Artificial**
 
-**Centro de Formación:** SENA – Centro de la Industria, la Empresa y los Servicios  
-**Programa:** Tecnólogo en Análisis y Desarrollo de Software (ADSO)  
-**Fecha de Consolidación:** 17/11/2026  
-**Versión:** 2.0 (Versión consolidada final — Arquitectura Python / Flask / MySQL XAMPP / Liquibase / Three.js WebGL)
+**Módulos del Sistema:** Usuarios · Materiales · Puntos de Recolección · Entregas · Billetera & ESG  
+**Tecnología Principal:** Python 3.12 / Flask / MySQL (XAMPP + Liquibase) / React + Three.js  
+**Inteligencia Artificial:** Clasificación orientativa de materiales mediante imágenes (Google Gemini Vision AI)
+
+---
+
+**Presentado por (Aprendiz):**  
+**PAULA VALENTINA VARGAS ANDRADE**
+
+**Presentado a (Instructor Técnico):**  
+**JAVIER UMBERTO PINTO**
+
+**Centro de Formación:**  
+SENA – Centro de la Industria, la Empresa y los Servicios
+
+**Fecha de Consolidación:** Noviembre de 2026  
+**Versión:** 2.0 — Entregable Consolidado Sprint 1 (SRS, HU, Casos de Uso, Diagramas UML, MER, Backlog Scrum y Prototipos IA)
+
+</div>
 
 ---
 
@@ -54,22 +70,24 @@
     - [3.3.8. Módulo de Administración y Auditoría del Sistema](#338-módulo-de-administración-y-auditoría-del-sistema)
     - [3.3.9. Módulo de Histórico Interactivo en Base de Datos, Migraciones y Optimización Operativa (Etapas 2 y 3: RF-019 a RF-028)](#339-módulo-de-histórico-interactivo-en-base-de-datos-migraciones-y-optimización-operativa-etapas-2-y-3-rf-019-a-rf-028)
   - [3.4. Requerimientos No Funcionales](#34-requerimientos-no-funcionales)
-- [4. Requisitos de casos de uso](#4-requisitos-de-casos-de-uso)
+- [4. Requisitos de casos de uso y Diagramas UML](#4-requisitos-de-casos-de-uso)
   - [4.1. Diagrama UML de Casos de Uso](#41-diagrama-uml-de-casos-de-uso)
   - [4.2. Caracterización de Casos de Uso](#42-caracterización-de-casos-de-uso)
     - [4.2.1. Casos de uso en funcionalidades](#421-casos-de-uso-en-funcionalidades)
-- [5. Modelo conceptual consolidado y corregido](#5-modelo-conceptual-consolidado-y-corregido)
+  - [4.3. Diagrama UML de Clases del Sistema](#43-diagrama-uml-de-clases-del-sistema)
+  - [4.4. Diagrama UML de Secuencia (Clasificación IA y Entrega en MySQL)](#44-diagrama-uml-de-secuencia-clasificación-ia-y-entrega-en-mysql)
+- [5. Modelo conceptual y Modelo Entidad-Relación (MER)](#5-modelo-conceptual-consolidado-y-corregido)
   - [5.1. Decisiones de corrección del modelo](#51-decisiones-de-corrección-del-modelo)
-  - [5.2. Entidades y atributos de referencia](#52-entidades-y-atributos-de-referencia)
+  - [5.2. Entidades y atributos de referencia (`ecocommunity_db`)](#52-entidades-y-atributos-de-referencia-ecocommunity_db)
+  - [5.2.1. Diagrama Modelo Entidad-Relación (MER - MySQL)](#521-diagrama-modelo-entidad-relación-mer---mysql)
   - [5.3. Relaciones y cardinalidades consolidadas](#53-relaciones-y-cardinalidades-consolidadas)
   - [5.4. Reglas de negocio consolidadas](#54-reglas-de-negocio-consolidadas)
 - [6. Dominios y microservicios propuestos](#6-dominios-y-microservicios-propuestos)
-  - [6.1. Funciones administrativas y transversales](#61-funciones-administrativas-y-transversales)
-  - [6.2. Integración entre microservicios](#62-integración-entre-microservicios)
 - [7. Patrones de arquitectura y diseño](#7-patrones-de-arquitectura-y-diseño)
-  - [7.1. Arquitectura objetivo simplificada](#71-arquitectura-objetivo-simplificada)
 - [8. Alcance consolidado y límites del proyecto](#8-alcance-consolidado-y-límites-del-proyecto)
-- [9. Fuente de verdad para trabajos posteriores](#9-fuente-de-verdad-para-trabajos-posteriores)
+- [9. Plan de Trabajo Scrum Simplificado (4 Semanas) y Product Backlog](#9-plan-de-trabajo-scrum-simplificado-4-semanas-y-product-backlog)
+- [10. Prototipos de Interfaces con IA y Diseño UI/UX (Figma)](#10-prototipos-de-interfaces-con-ia-y-diseño-uiux-figma)
+- [11. Fuente de verdad para trabajos posteriores](#11-fuente-de-verdad-para-trabajos-posteriores)
 
 ---
 
@@ -772,7 +790,161 @@ flowchart LR
 
 ---
 
-## 5. Modelo conceptual consolidado y corregido
+### 4.3. Diagrama UML de Clases del Sistema
+El siguiente diagrama de clases UML modela las entidades principales de negocio implementadas sobre **Python / Flask / MySQL** en los 4 módulos troncales del Proyecto #18 (**Usuarios**, **Materiales**, **Puntos de Recolección** y **Entregas**) más la **Billetera/Auditoría**:
+
+```mermaid
+classDiagram
+    class Rol {
+        +int id_rol
+        +string nombre
+        +string descripcion
+    }
+
+    class Usuario {
+        +int id_usuario
+        +int id_rol
+        +string nombre
+        +string email
+        +string password_hash
+        +string entidad
+        +string estado
+        +datetime fecha_registro
+        +autenticar()
+        +consultarBilletera()
+    }
+
+    class Material {
+        +int id_material
+        +string codigo_barras
+        +string nombre
+        +string categoria
+        +int puntos_por_kg
+        +float co2_factor
+        +string instrucciones_reciclaje
+        +clasificarConIA(imagenBase64)
+        +buscarPorCodigo(ean13)
+    }
+
+    class PuntoLimpio {
+        +int id_punto
+        +string nombre
+        +string direccion
+        +float latitud
+        +float longitud
+        +string horario
+        +float capacidad_max_kg
+        +float capacidad_actual_kg
+        +bool activo
+        +string codigo_qr_hash
+        +string tipo
+        +calcularDistanciaHaversine(latUsuario, lngUsuario)
+        +validarGeofencing20m(latUsuario, lngUsuario)
+    }
+
+    class Entrega {
+        +int id_entrega
+        +string uuid
+        +int id_usuario
+        +int id_punto
+        +string material_nombre
+        +string categoria
+        +float peso_kg
+        +int puntos_otorgados
+        +float co2_ahorrado_kg
+        +string estado
+        +float latitud_registro
+        +float longitud_registro
+        +int distancia_metros
+        +string qr_hash
+        +datetime fecha_entrega
+        +string cadena_custodia_paso
+        +string recibo_digital_hash
+        +generarHashCriptografico()
+        +actualizarCustodia(nuevoPaso)
+    }
+
+    class Transaccion {
+        +int id_transaccion
+        +int id_usuario
+        +string tipo
+        +int monto_puntos
+        +string descripcion
+        +datetime fecha
+        +string codigo_voucher
+    }
+
+    class Recompensa {
+        +string id_recompensa
+        +string sponsor
+        +string titulo
+        +int costo_ecocoins
+        +string categoria
+        +int stock
+        +canjearVoucher(idUsuario)
+    }
+
+    class RegistroAuditoria {
+        +int id_registro
+        +int id_usuario
+        +string accion
+        +string entidad_afectada
+        +string id_entidad
+        +datetime fecha_hora
+        +string ip_origen
+        +string detalle
+    }
+
+    Rol "1" --> "0..*" Usuario : asigna
+    Usuario "1" --> "0..*" Entrega : realiza
+    PuntoLimpio "1" --> "0..*" Entrega : recibe
+    Material "1" ..> "0..*" Entrega : clasifica
+    Usuario "1" --> "0..*" Transaccion : posee
+    Recompensa "1" --> "0..*" Transaccion : redime
+    Entrega "1" --> "1" Transaccion : acredita
+    Usuario "1" --> "0..*" RegistroAuditoria : audita
+```
+
+---
+
+### 4.4. Diagrama UML de Secuencia (Clasificación IA y Entrega en MySQL)
+Representa la interacción en tiempo real entre el Ciudadano, la interfaz React, el servidor **Python / Flask (`app.py`)**, el modelo **Google Gemini Vision AI** y la base de datos **MySQL (`ecocommunity_db`)**:
+
+```mermaid
+sequenceDiagram
+    actor C as Ciudadano
+    participant UI as Frontend React / ScannerView
+    participant API as Backend Python / Flask (app.py)
+    participant AI as Google Gemini Vision AI
+    participant DB as MySQL XAMPP (ecocommunity_db)
+
+    C->>UI: 1. Captura fotografía o código de barras del residuo
+    UI->>API: POST /api/ai/classify (imageBase64 / barcode)
+    alt Búsqueda por Código de Barras
+        API->>DB: SELECT * FROM materiales WHERE codigo_barras = ?
+        DB-->>API: Ficha de material reciclable
+    else Clasificación Orientativa por Imagen con IA
+        API->>AI: generate_content(imagen + JSON Schema)
+        AI-->>API: JSON {categoria, peso_estimado_kg, puntos, co2, consejos}
+    end
+    API-->>UI: Resultado de clasificación orientativa
+    UI-->>C: Muestra categoría, preparación y puntos estimados
+
+    C->>UI: 2. Se acerca al Punto Limpio (<= 20m) y escanea QR
+    UI->>API: POST /api/entregas/validate-and-deposit (lat, lng, qr_hash)
+    API->>DB: SELECT * FROM puntos_limpios WHERE id_punto = ?
+    DB-->>API: Coordenadas del punto y codigo_qr_hash
+    API->>API: Calcula Haversine (<= 20m) y verifica QR
+    API->>DB: Verifica antifraude 24h en tabla entregas
+    API->>DB: INSERT INTO entregas + INSERT INTO transacciones + UPDATE puntos_limpios
+    DB-->>API: Confirmación transaccional
+    API-->>UI: HTTP 200 + Recibo Digital Criptográfico (0x...)
+    UI-->>C: Muestra Recibo Digital y acredita Ecocoins
+```
+
+---
+
+## 5. Modelo conceptual y Modelo Entidad-Relación (MER)
 
 ### 5.1. Decisiones de corrección del modelo
 - **Unificación de Identidad por Roles:** En lugar de crear tablas separadas para cada actor, se implementa una entidad central `usuarios` vinculada a `roles`, gestionando los atributos específicos de empresa mediante el campo `entidad`.
@@ -791,6 +963,113 @@ flowchart LR
 - **transacciones:** `id_transaccion` (PK), `id_usuario` (FK $\rightarrow$ usuarios), `tipo` (`credito` \| `debito_canje`), `monto_puntos`, `descripcion`, `fecha`, `codigo_voucher` (opcional).
 - **recompensas:** `id_recompensa` (PK/VARCHAR), `sponsor`, `titulo`, `costo_ecocoins`, `categoria`, `descripcion`, `stock`, `marca_aliada_id`, `logo_svg`.
 - **registro_auditoria:** `id_registro` (PK), `id_usuario` (FK $\rightarrow$ usuarios, opcional), `accion`, `entidad_afectada`, `id_entidad`, `fecha_hora`, `ip_origen`, `detalle`.
+
+### 5.2.1. Diagrama Modelo Entidad-Relación (MER - MySQL)
+
+```mermaid
+erDiagram
+    ROLES ||--o{ USUARIOS : "asigna (1:N)"
+    USUARIOS ||--o{ ENTREGAS : "registra (1:N)"
+    PUNTOS_LIMPIOS ||--o{ ENTREGAS : "acopia (1:N)"
+    USUARIOS ||--o{ TRANSACCIONES : "movimientos (1:N)"
+    RECOMPENSAS ||--o{ TRANSACCIONES : "redime (1:N)"
+    USUARIOS ||--o{ REGISTRO_AUDITORIA : "ejecuta (1:N)"
+
+    ROLES {
+        int id_rol PK
+        varchar nombre UK
+        varchar descripcion
+    }
+
+    USUARIOS {
+        int id_usuario PK
+        int id_rol FK
+        varchar nombre
+        varchar email UK
+        varchar password_hash
+        varchar entidad
+        enum estado
+        datetime fecha_registro
+    }
+
+    MATERIALES {
+        int id_material PK
+        varchar codigo_barras UK
+        varchar nombre
+        varchar categoria
+        int puntos_por_kg
+        decimal co2_factor
+        text instrucciones_reciclaje
+    }
+
+    PUNTOS_LIMPIOS {
+        int id_punto PK
+        varchar nombre
+        varchar direccion
+        decimal latitud
+        decimal longitud
+        varchar horario
+        decimal capacidad_max_kg
+        decimal capacidad_actual_kg
+        boolean activo
+        varchar codigo_qr_hash UK
+        varchar tipo
+        text materiales_aceptados
+    }
+
+    ENTREGAS {
+        int id_entrega PK
+        varchar uuid UK
+        int id_usuario FK
+        int id_punto FK
+        varchar material_nombre
+        varchar categoria
+        decimal peso_kg
+        int puntos_otorgados
+        decimal co2_ahorrado_kg
+        varchar estado
+        decimal latitud_registro
+        decimal longitud_registro
+        int distancia_metros
+        varchar qr_hash
+        datetime fecha_entrega
+        enum cadena_custodia_paso
+        varchar recibo_digital_hash UK
+    }
+
+    TRANSACCIONES {
+        int id_transaccion PK
+        int id_usuario FK
+        enum tipo
+        int monto_puntos
+        varchar descripcion
+        datetime fecha
+        varchar codigo_voucher
+    }
+
+    RECOMPENSAS {
+        varchar id_recompensa PK
+        varchar sponsor
+        varchar titulo
+        int costo_ecocoins
+        varchar categoria
+        text descripcion
+        int stock
+        int marca_aliada_id
+        text logo_svg
+    }
+
+    REGISTRO_AUDITORIA {
+        int id_registro PK
+        int id_usuario FK
+        varchar accion
+        varchar entidad_afectada
+        varchar id_entidad
+        datetime fecha_hora
+        varchar ip_origen
+        text detalle
+    }
+```
 
 ### 5.3. Relaciones y cardinalidades consolidadas
 
@@ -886,10 +1165,67 @@ Para mantener la viabilidad formativa del proyecto y asegurar el cumplimiento de
 
 ---
 
-## 9. Fuente de verdad para trabajos posteriores
+## 9. Plan de Trabajo Scrum Simplificado (4 Semanas) y Product Backlog
 
-A partir de la aprobación de esta versión 2.0 del documento elaborada por **Paula Valentina Vargas Andrade** bajo la supervisión del instructor **Javier Umberto Pinto**:
-- Las especificaciones de los **Requerimientos Funcionales (RF-001 al RF-028)** y **No Funcionales (RNF-001 al RNF-010)** aquí detalladas constituyen el marco contractual de desarrollo y pruebas.
+El proyecto **#18: Plataforma de Reciclaje Comunitario (ECOCOMMUNITY)** se ejecuta bajo el marco ágil **Scrum Simplificado** estructurado en **un mes de desarrollo (4 Sprints de 1 semana cada uno)**:
+
+### 9.1. Cronograma de 4 Semanas (Sprints)
+
+| Semana / Sprint | Fase del Proyecto | Actividades Clave | Entregables Verificables | Estado |
+| :--- | :--- | :--- | :--- | :--- |
+| **Semana 1 — Sprint 1** | **Análisis y Diseño** | - Identificar el problema y caracterizar los usuarios (Ciudadano, Recolector, Acopio, Marca, Admin).<br>- Definir Requisitos Funcionales (`RF-001` a `RF-028`) y No Funcionales (`RNF-001` a `RNF-010`).<br>- Crear Historias de Usuario (`HU-01` a `HU-06`) y priorizar el Product Backlog.<br>- Diseñar el Modelo Entidad-Relación (MER) de las 8 tablas en MySQL.<br>- Crear prototipos de interfaces asistidos por IA (Hero 3D, Escáner, Mapa, Billetera, Histórico). | **Documento SRS v2.0, Product Backlog, Diagramas UML/MER y Prototipos UI/UX.** | ✅ **Completado** |
+| **Semana 2 — Sprint 2** | **Base de Datos MySQL, Liquibase y Backend Python/Flask** | - Crear base de datos `ecocommunity_db` en MySQL (XAMPP) y changelogs de **Liquibase**.<br>- Desarrollar API REST en **Python 3.12 / Flask** (`app.py`) para los módulos de `usuarios`, `materiales` y `puntos_limpios`.<br>- Implementar cálculo geodésico de Haversine y geofencing $\le 20$ m. | **Esquema MySQL versionado con Liquibase + Endpoints `/api/db/status` y `/api/puntos`.** | ✅ **Completado** |
+| **Semana 3 — Sprint 3** | **Clasificación IA Gemini y Módulo de Entregas** | - Integrar el SDK `google-genai` en Python/Flask (`/api/ai/classify`) con catálogo de códigos de barras.<br>- Implementar depósito con validación QR, antifraude de 24h y generación de recibo criptográfico.<br>- Construir el modal interactivo **Histórico BD** (`HistoricoModal.tsx`) y actualización de custodia. | **Escáner IA operativo + Depósitos en MySQL + Histórico interactivo.** | ✅ **Completado** |
+| **Semana 4 — Sprint 4** | **Billetera, ESG, Hero 3D WebGL, Pruebas QA y Despliegue** | - Completar módulo de Billetera Ecocoins, canje de vouchers y tablero ESG.<br>- Integrar Hero 3D interactivo en **Three.js / WebGL** (`HeroThreeJS.tsx`).<br>- Ejecutar suite de pruebas unitarias Python/MySQL (`8/8 PASS`) y flujo Git (`dev` $\rightarrow$ `qa` $\rightarrow$ `main`). | **Plataforma completa integrada, pruebas QA aprobadas y repositorio en GitHub.** | ✅ **Completado** |
+
+### 9.2. Product Backlog Priorizado (Scrum)
+
+| ID Backlog | Historia / Épica Asociada | Módulo Proyecto #18 | Prioridad | Story Points | Sprint Asignado |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **PB-01** | Levantamiento de SRS, Casos de Uso (`CU-01` a `CU-09`), Diagramas UML y MER | Análisis y Diseño | Alta | 5 pts | Sprint 1 |
+| **PB-02** | Diseño de prototipos de alta fidelidad con IA y escena 3D interactiva | Diseño UI/UX (Figma) | Alta | 5 pts | Sprint 1 |
+| **PB-03** | Modelado físico en MySQL XAMPP (`ecocommunity_db`) y migraciones con Liquibase | Base de Datos | Alta | 5 pts | Sprint 2 |
+| **PB-04** | Gestión de roles, autenticación de usuarios y portales diferenciados (`HU-01`) | Módulo Usuarios | Alta | 3 pts | Sprint 2 |
+| **PB-05** | Catálogo de materiales reciclables y clasificación orientativa por imagen con IA (`HU-02`) | Módulo Materiales + IA | Alta | 8 pts | Sprint 3 |
+| **PB-06** | Mapa de puntos de recolección y validación de cercanía Haversine $\le 20$ m (`HU-03`) | Módulo Puntos | Alta | 5 pts | Sprint 2 |
+| **PB-07** | Registro de entregas con QR, control antifraude 24h y recibo criptográfico (`HU-04`) | Módulo Entregas | Alta | 8 pts | Sprint 3 |
+| **PB-08** | Histórico interactivo de entregas en MySQL y cambio de cadena de custodia (`CU-07`) | Módulo Entregas / BD | Alta | 5 pts | Sprint 3 |
+| **PB-09** | Billetera de Ecocoins y canje de vouchers de marcas aliadas (`HU-05`) | Módulo Billetera | Media | 5 pts | Sprint 4 |
+| **PB-10** | Reportes consolidados de impacto ESG y pruebas automatizadas en rama `qa` (`HU-06`) | Módulo ESG & QA | Media | 5 pts | Sprint 4 |
+
+---
+
+## 10. Prototipos de Interfaces con IA y Diseño UI/UX (Figma)
+
+Durante el **Sprint 1 (Semana 1 — Análisis y Diseño)** se diseñaron los prototipos de alta fidelidad asistidos por Inteligencia Artificial para cubrir los 4 módulos del **Proyecto #18 (Usuarios, Materiales, Puntos y Entregas)**:
+
+### 10.1. Sistema de Diseño Visual
+- **Estética General:** Interfaz corporativa y futurista sobre economía circular (16:9) combinada con tarjetas limpias de alta legibilidad.
+- **Paleta de Colores Oficial:**
+  - **Fondo Hero / Telemetría:** Verde-Obsidiana Profundo (`#050b07` / `#090d0a`) con cuadrícula digital de micro-puntos.
+  - **Acento Principal (Lime Canopy):** `#d7eb80` y Esmeralda Vibrante `#22c55e` / `#4ade80`.
+  - **Acento Dorado Circular:** `#D4AF37`.
+  - **Superficies Claras de Trabajo:** Blanco Papel (`#ffffff`), Niebla Cálida (`#f8f8f6`) y Texto Carbón (`#333333`).
+- **Tipografía:** `Inter Tight` / `Inter` para encabezados y lectura editorial, y `JetBrains Mono` para hashes criptográficos, telemetría satelital y etiquetas de módulos.
+
+### 10.2. Catálogo de Pantallas Prototipadas e Implementadas
+1. **Pantalla 1 — Portada Hero 3D de Telemetría Ambiental (`HeroThreeJS.tsx` + `DashboardView.tsx`):**
+   - Dividida en dos columnas: a la izquierda, etiqueta `● ECONOMÍA CIRCULAR GEOLOCALIZADA`, título principal, botones `ESCANEAR RESIDUO →` y `☉ EXPLORAR PUNTOS LIMPIOS`, tres tarjetas *Glassmorphism* (`Desviado`, `Billetera`, `CO₂ Ahorrado`) y barra de `MÓDULOS`; a la derecha, el planeta Tierra hiperrealista sostenido por dos manos humanas con órbitas holográficas 3D en **Three.js**.
+2. **Pantalla 2 — Escáner IA Gemini y Clasificación de Materiales (`ScannerView.tsx`):**
+   - Selector de modo (Fotografía con IA Gemini o Código de Barras EAN-13), vista previa de imagen, tarjeta de diagnóstico orientativo (categoría, peso estimado, Ecocoins, $CO_2$ evitado e instrucciones de limpieza) y confirmación de depósito con código QR.
+3. **Pantalla 3 — Mapa de Puntos de Recolección y Geofencing (`MapView.tsx`):**
+   - Listado geolocalizado de puntos limpios ordenado por cercanía (fórmula de Haversine), indicador en verde cuando el ciudadano está a $\le 20$ metros, barra de capacidad en kg y materiales aceptados.
+4. **Pantalla 4 — Histórico Interactivo de Base de Datos MySQL (`HistoricoModal.tsx`):**
+   - Conectado en vivo a `ecocommunity_db` en XAMPP: muestra insignia de estado MySQL, contadores de las 8 tablas, buscador por hash/material/usuario, vista maestro-detalle y botones para actualizar la cadena de custodia (`depositado` $\rightarrow$ `recolectado` $\rightarrow$ `en_acopio` $\rightarrow$ `transformado`).
+5. **Pantalla 5 — Billetera de Ecocoins, Vouchers y Reporte ESG (`WalletView.tsx` y `ESGReportView.tsx`):**
+   - Balance de Ecocoins, catálogo de recompensas patrocinadas, emisión de voucher digital y tablero de auditoría ambiental ISO 14001.
+
+---
+
+## 11. Fuente de verdad para trabajos posteriores
+
+A partir de la aprobación de esta versión 2.0 del documento elaborada por **Paula Valentina Vargas Andrade** bajo la supervisión del instructor **Javier Umberto Pinto** en el **SENA – Centro de la Industria, la Empresa y los Servicios**:
+- Las especificaciones de los **Requerimientos Funcionales (RF-001 al RF-028)**, **No Funcionales (RNF-001 al RNF-010)**, **Historias de Usuario (HU-01 a HU-06)**, **Casos de Uso (CU-01 a CU-09)** y **Diagramas UML / MER** aquí detalladas constituyen el marco contractual de desarrollo y pruebas.
 - El modelo conceptual y físico en MySQL (Sección 5), los changelogs de Liquibase y los contratos de API en Python/Flask definidos en la Sección 3 prevalecerán ante cualquier divergencia previa.
 - Todos los casos de prueba automatizados (`tests/test_python_mysql.py` y `tests/qa-test-suite.ts`) validan directamente los requerimientos aquí especificados.
 
