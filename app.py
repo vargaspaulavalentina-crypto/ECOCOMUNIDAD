@@ -439,6 +439,9 @@ def validate_and_deposit():
             receipt_hash = '0x' + secrets.token_hex(4) + hex(int(time.time()))[2:]
             entrega_uuid = f"ent-{uuid.uuid4().hex[:10]}"
 
+            # Transacción atómica ACID en MySQL (entrega + crédito + capacidad + auditoría)
+            conn.begin()
+
             # 6. Insertar Entrega en MySQL
             cursor.execute("""
                 INSERT INTO entregas (
@@ -504,6 +507,7 @@ def validate_and_deposit():
                 'recibo_digital_hash': receipt_hash
             }
 
+        conn.commit()
         conn.close()
         return jsonify({
             'success': True,
@@ -512,6 +516,10 @@ def validate_and_deposit():
             'nuevo_saldo_ecocoins': nuevo_saldo
         })
     except Exception as err:
+        try:
+            conn.rollback()
+        except Exception:
+            pass
         conn.close()
         return jsonify({'error': 'Error registrando entrega en base de datos', 'detalles': str(err)}), 500
 
@@ -621,7 +629,8 @@ def redeem_reward():
                     'costo_requerido': reward['costo_ecocoins']
                 }), 400
 
-            # 3. Generar Voucher
+            # 3. Generar Voucher y ejecutar transacción atómica ACID
+            conn.begin()
             voucher_code = f"ECO-{reward['sponsor'][:4].upper()}-{secrets.randbelow(9000) + 1000}"
 
             # 4. Insertar Transacción de débito
@@ -645,6 +654,7 @@ def redeem_reward():
 
             nuevo_saldo = saldo_actual - reward['costo_ecocoins']
 
+        conn.commit()
         conn.close()
         return jsonify({
             'success': True,
@@ -659,6 +669,10 @@ def redeem_reward():
             'nuevo_saldo': nuevo_saldo
         })
     except Exception as err:
+        try:
+            conn.rollback()
+        except Exception:
+            pass
         conn.close()
         return jsonify({'error': 'Error procesando canje', 'detalles': str(err)}), 500
 

@@ -60,6 +60,31 @@ export default function App() {
   useEffect(() => {
     const initData = async () => {
       try {
+        const token = localStorage.getItem('ecocommunity_jwt');
+        if (token) {
+          const meRes = await fetch('/api/auth/me', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (meRes.ok) {
+            const meData = await meRes.json();
+            if (meData.user) {
+              const restoredUser: UserProfile = {
+                id: meData.user.id_usuario,
+                nombre: meData.user.nombre,
+                email: meData.user.email,
+                rol: meData.user.rol,
+                entidad: meData.user.entidad || 'Comunidad EcoCommunity',
+                avatar_url: meData.user.avatar_url,
+              };
+              setCurrentUser(restoredUser);
+              localStorage.setItem('ecocommunity_auth_user', JSON.stringify(restoredUser));
+            }
+          } else {
+            localStorage.removeItem('ecocommunity_jwt');
+            localStorage.removeItem('ecocommunity_auth_user');
+            setCurrentUser(null);
+          }
+        }
         await Promise.all([fetchWallet(), new Promise((res) => setTimeout(res, 500))]);
       } finally {
         setIsInitialLoading(false);
@@ -124,12 +149,15 @@ export default function App() {
     } catch (e) {
       console.error(e);
     }
+    fetchWallet();
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
+    setWalletData(null);
     try {
       localStorage.removeItem('ecocommunity_auth_user');
+      localStorage.removeItem('ecocommunity_jwt');
     } catch (e) {
       console.error(e);
     }
