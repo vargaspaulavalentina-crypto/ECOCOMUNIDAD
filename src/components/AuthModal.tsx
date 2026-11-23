@@ -6,12 +6,14 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLoginSuccess: (user: UserProfile) => void;
+  asPage?: boolean;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   onLoginSuccess,
+  asPage = false,
 }) => {
   const [tab, setTab] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
@@ -158,8 +160,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/45 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-[#ffffff] rounded-[20px] overflow-hidden text-[#333333] border border-[#f0f0eb] shadow-2xl flex flex-col max-h-[92vh]">
+    <div
+      className={
+        asPage
+          ? 'min-h-[75vh] flex flex-col items-center justify-center py-6'
+          : 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/45 backdrop-blur-sm animate-in fade-in duration-200'
+      }
+    >
+      {asPage && (
+        <div className="w-full max-w-lg mb-4 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f0f0eb] hover:bg-[#e2e2da] text-xs font-semibold text-[#333333] transition-colors cursor-pointer"
+          >
+            <span>← Volver a la página de inicio</span>
+          </button>
+          <span className="text-xs font-mono text-[#6c6c6c]">Página 2 · Acceso a la App</span>
+        </div>
+      )}
+      <div
+        className={`relative w-full max-w-lg bg-[#ffffff] rounded-[20px] overflow-hidden text-[#333333] border border-[#f0f0eb] shadow-2xl flex flex-col ${
+          asPage ? '' : 'max-h-[92vh]'
+        }`}
+      >
         {/* Modal Header */}
         <div className="p-6 pb-4 border-b border-[#f0f0eb] flex items-center justify-between">
           <div className="flex items-center gap-2">

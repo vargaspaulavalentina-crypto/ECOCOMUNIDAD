@@ -115,13 +115,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               </>
             ) : (
-              /* Unauthenticated user: ONLY ONE primary button "Escanear Residuo" */
+              /* Unauthenticated user: botón para ir a la página de Iniciar Sesión y usar la App */
               <button
                 onClick={onOpenAuthModal}
-                className="btn-pill-lime text-xs sm:text-sm px-6 py-2.5 sm:py-3 shadow-none whitespace-nowrap shrink-0 font-semibold flex items-center gap-2"
+                className="btn-pill-lime text-xs sm:text-sm px-6 py-2.5 sm:py-3 shadow-none whitespace-nowrap shrink-0 font-semibold flex items-center gap-2 cursor-pointer"
               >
                 <Leaf className="w-4 h-4 text-[#333333]" />
-                <span>Escanear Residuo</span>
+                <span>Iniciar Sesión / Usar App</span>
               </button>
             )}
           </div>

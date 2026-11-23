@@ -33,6 +33,7 @@ export default function App() {
   });
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [showLoginPage, setShowLoginPage] = useState(false);
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [historicoModalOpen, setHistoricoModalOpen] = useState(false);
   const [walletData, setWalletData] = useState<UserWalletData | null>(null);
@@ -233,10 +234,11 @@ export default function App() {
     }
   };
 
-  // Called when user clicks "Escanear Residuo" on the navbar or landing page
+  // Called when user clicks "Iniciar Sesión / Usar App" or "Escanear Residuo"
   const handleScanActionClick = () => {
     if (!currentUser) {
-      setAuthModalOpen(true);
+      setShowLoginPage(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       // If already logged in, stay or switch to citizen portal if needed
       if (currentUser.rol !== 'ciudadano') {
@@ -256,13 +258,17 @@ export default function App() {
         isSyncing={isSyncing}
       />
 
-      {/* Main Top Bar: clean navbar with ONLY "Escanear Residuo" button as requested */}
+      {/* Main Top Bar */}
       <Navbar
         currentUser={currentUser}
-        onOpenAuthModal={() => setAuthModalOpen(true)}
-        onLogout={handleLogout}
+        onOpenAuthModal={() => handleScanActionClick()}
+        onLogout={() => {
+          handleLogout();
+          setShowLoginPage(false);
+        }}
         onNavigateHome={() => {
           if (!currentUser) {
+            setShowLoginPage(false);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           } else {
             handleScanActionClick();
@@ -277,18 +283,31 @@ export default function App() {
         {isInitialLoading ? (
           <SiteLoadingSkeleton />
         ) : !currentUser ? (
-          /* UNATHENTICATED PUBLIC SITE: Clicking any scan or action button triggers AuthModal */
-          <DashboardView
-            walletData={walletData}
-            recentDeliveries={recentDeliveries}
-            onNavigate={(_tab) => handleScanActionClick()}
-            onSelectReceipt={(entrega) => {
-              setActiveReceipt(entrega);
-              setActivePunto(null);
-              setReceiptModalOpen(true);
-            }}
-            onScanClick={handleScanActionClick}
-          />
+          showLoginPage ? (
+            /* PÁGINA 2: INICIAR SESIÓN Y UTILIZAR LA APP */
+            <AuthModal
+              isOpen={true}
+              asPage={true}
+              onClose={() => setShowLoginPage(false)}
+              onLoginSuccess={(user) => {
+                handleLoginSuccess(user);
+                setShowLoginPage(false);
+              }}
+            />
+          ) : (
+            /* PÁGINA 1: PORTADA PRINCIPAL (ESTÉTICA DE INICIO) */
+            <DashboardView
+              walletData={walletData}
+              recentDeliveries={recentDeliveries}
+              onNavigate={(_tab) => handleScanActionClick()}
+              onSelectReceipt={(entrega) => {
+                setActiveReceipt(entrega);
+                setActivePunto(null);
+                setReceiptModalOpen(true);
+              }}
+              onScanClick={handleScanActionClick}
+            />
+          )
         ) : (
           /* AUTHENTICATED: Separate & Private Designated Web Portals for each role */
           <>
