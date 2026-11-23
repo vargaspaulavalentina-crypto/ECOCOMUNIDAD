@@ -239,10 +239,41 @@ export const AdminPrivateWeb: React.FC<AdminPrivateWebProps> = ({ currentUser })
               </div>
 
               <button
-                onClick={() => alert('¡Tarifas de compensación municipal actualizadas y propagadas a la red!')}
+                onClick={async () => {
+                  const token = localStorage.getItem('ecocommunity_jwt');
+                  if (!token) {
+                    alert('Inicia sesión como SuperAdmin Eco (admin@ecocommunity.org) para guardar cambios en MySQL.');
+                    return;
+                  }
+                  try {
+                    const updates = [
+                      { id: 1, puntos_por_kg: rates.pet },
+                      { id: 2, puntos_por_kg: rates.aluminio },
+                      { id: 3, puntos_por_kg: rates.carton },
+                      { id: 4, puntos_por_kg: rates.vidrio },
+                    ];
+                    for (const item of updates) {
+                      const res = await fetch(`/api/materiales/${item.id}`, {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ puntos_por_kg: item.puntos_por_kg }),
+                      });
+                      if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(err.error || 'Error actualizando material en MySQL');
+                      }
+                    }
+                    alert('¡Tarifas actualizadas en MySQL (tabla materiales) con éxito!');
+                  } catch (e: any) {
+                    alert(e.message || 'Error guardando tarifas en MySQL.');
+                  }
+                }}
                 className="w-full btn-pill-lime py-3 text-xs font-bold"
               >
-                Actualizar Tarifas Municipales
+                Actualizar Tarifas Municipales en MySQL
               </button>
             </div>
           </div>

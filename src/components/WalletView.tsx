@@ -59,10 +59,14 @@ export const WalletView: React.FC<WalletViewProps> = ({ walletData, onRefreshWal
     setRedeeming(true);
 
     try {
+      const token = localStorage.getItem('ecocommunity_jwt');
       const res = await fetch('/api/rewards/redeem', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rewardId: reward.id, usuario_id: 1 }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ rewardId: reward.id }),
       });
 
       const data = await res.json();

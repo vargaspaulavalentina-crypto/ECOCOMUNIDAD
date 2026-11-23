@@ -365,10 +365,15 @@ def classify_material():
     })
 
 @app.route('/api/entregas/validate-and-deposit', methods=['POST'])
+@require_auth
 def validate_and_deposit():
     """Valida QR, geofencing <= 20m, antifraude 24h e inserta en MySQL la entrega y transaccion."""
     data = request.get_json() or {}
-    usuario_id = int(data.get('usuario_id', 1))
+    auth_user = g.current_user
+    req_uid = data.get('usuario_id')
+    if req_uid is not None and int(req_uid) != auth_user['id_usuario'] and auth_user['rol'] != 'admin':
+        return jsonify({'error': 'No autorizado para registrar entregas en nombre de otro usuario.'}), 403
+    usuario_id = int(req_uid) if req_uid is not None else auth_user['id_usuario']
     punto_id = int(data.get('punto_id', 1))
     material_nombre = data.get('material_nombre', 'Residuo Clasificado')
     categoria = data.get('categoria', 'Plástico PET')
@@ -511,9 +516,14 @@ def validate_and_deposit():
         return jsonify({'error': 'Error registrando entrega en base de datos', 'detalles': str(err)}), 500
 
 @app.route('/api/user/wallet', methods=['GET'])
+@require_auth
 def get_user_wallet():
     """Consulta de balance de Ecocoins, transacciones, recompensas e impacto desde MySQL."""
-    usuario_id = request.args.get('usuario_id', default=1, type=int)
+    auth_user = g.current_user
+    req_uid = request.args.get('usuario_id', type=int)
+    if req_uid is not None and req_uid != auth_user['id_usuario'] and auth_user['rol'] != 'admin':
+        return jsonify({'error': 'No autorizado para consultar la billetera de otro usuario.'}), 403
+    usuario_id = req_uid if req_uid is not None else auth_user['id_usuario']
 
     conn = get_db_connection()
     try:
@@ -574,11 +584,16 @@ def get_user_wallet():
         return jsonify({'error': 'Error consultando billetera en base de datos', 'detalles': str(err)}), 500
 
 @app.route('/api/rewards/redeem', methods=['POST'])
+@require_auth
 def redeem_reward():
     """Canje de beneficios en MySQL con generacion de voucher y actualizacion atomica de stock."""
     data = request.get_json() or {}
+    auth_user = g.current_user
+    req_uid = data.get('usuario_id')
+    if req_uid is not None and int(req_uid) != auth_user['id_usuario'] and auth_user['rol'] != 'admin':
+        return jsonify({'error': 'No autorizado para canjear recompensas con otra cuenta.'}), 403
     reward_id = data.get('rewardId')
-    usuario_id = int(data.get('usuario_id', 1))
+    usuario_id = int(req_uid) if req_uid is not None else auth_user['id_usuario']
 
     conn = get_db_connection()
     try:
@@ -775,11 +790,18 @@ def get_entregas_history():
         return jsonify({'error': 'Error consultando histórico de entregas', 'detalles': str(err)}), 500
 
 @app.route('/api/entregas/<int:entrega_id>/custodia', methods=['PUT'])
+@require_auth
+@require_roles('recolector', 'punto_acopio', 'admin')
 def update_cadena_custodia(entrega_id):
-    """Actualiza interactivamente el paso en la cadena de custodia de un residuo en MySQL."""
+    """Actualiza secuencialmente el paso en la cadena de custodia de un residuo en MySQL."""
     data = request.get_json() or {}
     nuevo_paso = data.get('nuevo_paso')
     pasos_validos = ['depositado', 'recolectado', 'en_acopio', 'transformado']
+    transiciones_validas = {
+        'depositado': 'recolectado',
+        'recolectado': 'en_acopio',
+        'en_acopio': 'transformado',
+    }
 
     if nuevo_paso not in pasos_validos:
         return jsonify({'error': f'Paso no válido. Debe ser uno de: {", ".join(pasos_validos)}'}), 400
@@ -793,15 +815,24 @@ def update_cadena_custodia(entrega_id):
                 return jsonify({'error': 'Entrega no encontrada'}), 404
 
             paso_anterior = entrega['cadena_custodia_paso']
+            siguiente_esperado = transiciones_validas.get(paso_anterior)
+            if siguiente_esperado != nuevo_paso:
+                return jsonify({
+                    'error': f"Transición secuencial inválida de '{paso_anterior}' a '{nuevo_paso}'.",
+                    'paso_actual': paso_anterior,
+                    'siguiente_paso_permitido': siguiente_esperado,
+                    'orden_secuencial': 'depositado -> recolectado -> en_acopio -> transformado'
+                }), 400
+
             cursor.execute("""
                 UPDATE entregas SET cadena_custodia_paso = %s WHERE id_entrega = %s;
             """, (nuevo_paso, entrega_id))
 
             # Registro de auditoría
             cursor.execute("""
-                INSERT INTO registro_auditoria (accion, entidad_afectada, id_entidad, ip_origen, detalle)
-                VALUES ('TRANSICION_CUSTODIA', 'entregas', %s, %s, %s);
-            """, (str(entrega_id), request.remote_addr, f"Paso actualizado de '{paso_anterior}' a '{nuevo_paso}'"))
+                INSERT INTO registro_auditoria (usuario_id, accion, entidad_afectada, id_entidad, ip_origen, detalle)
+                VALUES (%s, 'TRANSICION_CUSTODIA', 'entregas', %s, %s, %s);
+            """, (g.current_user['id_usuario'], str(entrega_id), request.remote_addr, f"Paso actualizado de '{paso_anterior}' a '{nuevo_paso}'"))
 
         conn.close()
         return jsonify({
@@ -1395,15 +1426,66 @@ def openapi_spec():
                 'delete': {'tags': ['Puntos Limpios CRUD'], 'security': [{'BearerAuth': []}], 'summary': 'Eliminar/desactivar punto limpio (solo admin)'},
             },
             '/api/ai/classify': {'post': {'tags': ['IA Gemini'], 'summary': 'Clasificar residuo por imagen o código de barras'}},
-            '/api/entregas/validate-and-deposit': {'post': {'tags': ['Entregas CRUD'], 'summary': 'Validar QR + Geofencing <=20m y registrar entrega'}},
+            '/api/entregas/validate-and-deposit': {
+                'post': {
+                    'tags': ['Entregas CRUD'],
+                    'security': [{'BearerAuth': []}],
+                    'summary': 'Validar QR + Geofencing <=20m + Antifraude 24h y registrar entrega (propio usuario o admin)',
+                    'responses': {
+                        '200': {'description': 'Entrega confirmada y Ecocoins acreditados'},
+                        '400': {'description': 'QR inválido o coordenadas GPS faltantes'},
+                        '401': {'description': 'Token Bearer faltante o inválido'},
+                        '403': {'description': 'Geofencing > 20m o usuario no autorizado'},
+                        '404': {'description': 'Punto limpio no encontrado o inactivo'},
+                        '429': {'description': 'Regla antifraude 24h activada'}
+                    }
+                }
+            },
             '/api/entregas/history': {'get': {'tags': ['Entregas CRUD'], 'summary': 'Histórico filtrable de entregas en MySQL'}},
             '/api/entregas/{id}': {
                 'get': {'tags': ['Entregas CRUD'], 'summary': 'Obtener entrega por ID'},
                 'delete': {'tags': ['Entregas CRUD'], 'security': [{'BearerAuth': []}], 'summary': 'Eliminar entrega (solo admin)'},
             },
-            '/api/entregas/{id}/custodia': {'put': {'tags': ['Entregas CRUD'], 'summary': 'Actualizar paso en cadena de custodia'}},
-            '/api/user/wallet': {'get': {'tags': ['Billetera & ESG'], 'summary': 'Consultar saldo Ecocoins y transacciones'}},
-            '/api/rewards/redeem': {'post': {'tags': ['Billetera & ESG'], 'summary': 'Canjear recompensa por voucher'}},
+            '/api/entregas/{id}/custodia': {
+                'put': {
+                    'tags': ['Entregas CRUD'],
+                    'security': [{'BearerAuth': []}],
+                    'summary': 'Actualizar paso secuencial de custodia (recolector, punto_acopio, admin): depositado -> recolectado -> en_acopio -> transformado',
+                    'responses': {
+                        '200': {'description': 'Transición secuencial aplicada en MySQL'},
+                        '400': {'description': 'Paso inválido o salto fuera de secuencia'},
+                        '401': {'description': 'Token Bearer faltante o inválido'},
+                        '403': {'description': 'Rol sin permisos (requiere recolector, punto_acopio o admin)'},
+                        '404': {'description': 'Entrega no encontrada'}
+                    }
+                }
+            },
+            '/api/user/wallet': {
+                'get': {
+                    'tags': ['Billetera & ESG'],
+                    'security': [{'BearerAuth': []}],
+                    'summary': 'Consultar saldo Ecocoins y transacciones (propio usuario o admin)',
+                    'responses': {
+                        '200': {'description': 'Balance e historial de transacciones'},
+                        '401': {'description': 'Token Bearer faltante o inválido'},
+                        '403': {'description': 'Intento de consultar billetera de otro usuario sin rol admin'}
+                    }
+                }
+            },
+            '/api/rewards/redeem': {
+                'post': {
+                    'tags': ['Billetera & ESG'],
+                    'security': [{'BearerAuth': []}],
+                    'summary': 'Canjear recompensa por voucher (propio usuario o admin)',
+                    'responses': {
+                        '200': {'description': 'Voucher generado y stock descontado'},
+                        '400': {'description': 'Saldo insuficiente o stock agotado'},
+                        '401': {'description': 'Token Bearer faltante o inválido'},
+                        '403': {'description': 'Intento de canjear con cuenta ajena sin rol admin'},
+                        '404': {'description': 'Recompensa no encontrada'}
+                    }
+                }
+            },
             '/api/esg/report': {'get': {'tags': ['Billetera & ESG'], 'summary': 'Reporte consolidado de sostenibilidad ESG'}},
         }
     }

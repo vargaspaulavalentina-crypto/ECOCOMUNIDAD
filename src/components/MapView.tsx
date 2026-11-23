@@ -136,9 +136,13 @@ export const MapView: React.FC<MapViewProps> = ({
     setDepositError(null);
 
     try {
+      const token = localStorage.getItem('ecocommunity_jwt');
       const res = await fetch('/api/entregas/validate-and-deposit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(payload),
       });
 

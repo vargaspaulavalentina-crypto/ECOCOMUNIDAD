@@ -70,10 +70,15 @@ export default function App() {
 
   const fetchWallet = async () => {
     try {
-      const res = await fetch('/api/user/wallet');
-      if (res.ok) {
-        const data: UserWalletData = await res.json();
-        setWalletData(data);
+      const token = localStorage.getItem('ecocommunity_jwt');
+      if (token) {
+        const res = await fetch('/api/user/wallet', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data: UserWalletData = await res.json();
+          setWalletData(data);
+        }
       }
       const esgRes = await fetch('/api/esg/report');
       if (esgRes.ok) {
@@ -177,10 +182,14 @@ export default function App() {
     if (offlineQueue.length === 0 || isOffline) return;
     setIsSyncing(true);
     try {
+      const token = localStorage.getItem('ecocommunity_jwt');
       for (const item of offlineQueue) {
         await fetch('/api/entregas/validate-and-deposit', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
           body: JSON.stringify(item),
         });
       }

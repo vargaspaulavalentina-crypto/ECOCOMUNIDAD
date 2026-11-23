@@ -100,12 +100,19 @@ export const HistoricoModal: React.FC<HistoricoModalProps> = ({
   const handleUpdateCustodia = async (entregaId: number, nuevoPaso: string) => {
     setIsUpdatingCustodia(true);
     try {
+      const token = localStorage.getItem('ecocommunity_jwt');
       const res = await fetch(`/api/entregas/${entregaId}/custodia`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ nuevo_paso: nuevoPaso }),
       });
-      if (res.ok) {
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.error || 'Inicia sesión como recolector, centro de acopio o admin para actualizar custodia.');
+      } else {
         const result = await res.json();
         // Actualizar estado local
         setEntregas((prev) =>
