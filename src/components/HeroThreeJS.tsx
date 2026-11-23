@@ -211,10 +211,10 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
     rootGroup.add(orbitsGroup);
 
     const orbitConfigs = [
-      { radius: 1.48, tube: 0.007, rotX: 1.18, rotY: -0.32, speed: 0.35, color: 0x4ade80, opacity: 0.72 },
-      { radius: 1.62, tube: 0.0045, rotX: 1.24, rotY: -0.28, speed: -0.28, color: 0xd7eb80, opacity: 0.55 },
-      { radius: 1.34, tube: 0.005, rotX: 0.85, rotY: 0.42, speed: 0.45, color: 0x22c55e, opacity: 0.48 },
-      { radius: 1.74, tube: 0.0035, rotX: 1.12, rotY: -0.36, speed: 0.22, color: 0x86efac, opacity: 0.35 },
+      { radius: 1.48, tube: 0.0035, rotX: 1.18, rotY: -0.32, speed: 0.35, color: 0x4ade80, opacity: 0.28 },
+      { radius: 1.62, tube: 0.0025, rotX: 1.24, rotY: -0.28, speed: -0.28, color: 0xd7eb80, opacity: 0.22 },
+      { radius: 1.34, tube: 0.0028, rotX: 0.85, rotY: 0.42, speed: 0.45, color: 0x22c55e, opacity: 0.18 },
+      { radius: 1.74, tube: 0.0020, rotX: 1.12, rotY: -0.36, speed: 0.22, color: 0x86efac, opacity: 0.14 },
     ];
 
     const orbitRings: Array<{ mesh: THREE.Mesh; speed: number }> = [];
@@ -299,7 +299,7 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
     const netMat = new THREE.LineBasicMaterial({
       color: 0x4ade80,
       transparent: true,
-      opacity: 0.32,
+      opacity: 0.0,
       blending: THREE.AdditiveBlending,
     });
     const networkLines = new THREE.LineSegments(netGeo, netMat);
@@ -661,19 +661,15 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
             ref={visualWrapRef}
             className="relative w-full max-w-[640px] h-[440px] sm:h-[520px] flex items-center justify-center transition-transform duration-75 ease-out"
           >
-            {/* Capa Base Hiperrealista: Planeta Tierra con continentes, nubes y manos humanas detalladas */}
+            {/* Capa Base Hiperrealista: Planeta Tierra con continentes, nubes y manos humanas detalladas (PNG transparente) */}
             <img
-              src="/images/earth_hands_hero.jpg"
+              src="/images/earth_hands_hero.png"
               alt="Planeta Tierra hiperrealista sostenido con delicadeza por dos manos humanas rodeado de órbitas holográficas"
               className="pointer-events-none w-full h-full object-contain scale-[1.12] sm:scale-[1.18]"
               style={{
-                maskImage:
-                  'radial-gradient(ellipse 68% 66% at 50% 50%, rgba(0,0,0,1) 62%, rgba(0,0,0,0.65) 80%, rgba(0,0,0,0) 98%)',
-                WebkitMaskImage:
-                  'radial-gradient(ellipse 68% 66% at 50% 50%, rgba(0,0,0,1) 62%, rgba(0,0,0,0.65) 80%, rgba(0,0,0,0) 98%)',
                 filter: pulseBoost
                   ? 'saturate(1.22) contrast(1.08) drop-shadow(0 0 35px rgba(74, 222, 128, 0.35))'
-                  : 'saturate(1.1) contrast(1.05)',
+                  : 'saturate(1.1) contrast(1.05) drop-shadow(0 12px 32px rgba(0, 0, 0, 0.55))',
               }}
             />
 

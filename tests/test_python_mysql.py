@@ -146,7 +146,147 @@ class EcoCommunityPythonMySQLTestCase(unittest.TestCase):
         data = response.get_json()
         self.assertIn('metricas_acumuladas', data)
         self.assertIn('cadena_de_custodia', data)
-        print("  [PASS] Test 8: Reporte consolidado ESG y desglose por categorías validado.\n")
+        print("  [PASS] Test 8: Reporte consolidado ESG y desglose por categorías validado.")
+
+    def test_09_auth_register_login_and_me(self):
+        """Verifica registro de usuario, hash de contraseña, login JWT y /api/auth/me."""
+        unique_email = f'qa.{int(time.time() * 1000)}@ecocommunity.org'
+        reg_res = self.client.post('/api/auth/register', json={
+            'nombre': 'Usuario QA',
+            'email': unique_email,
+            'password': 'PasswordQA123',
+            'rol': 'ciudadano'
+        })
+        self.assertEqual(reg_res.status_code, 201)
+        reg_data = reg_res.get_json()
+        self.assertIn('token', reg_data)
+        created_uid = reg_data['user']['id_usuario']
+
+        # Login con credenciales válidas
+        login_res = self.client.post('/api/auth/login', json={
+            'email': unique_email,
+            'password': 'PasswordQA123'
+        })
+        self.assertEqual(login_res.status_code, 200)
+        token = login_res.get_json()['token']
+
+        # Consultar /api/auth/me con token Bearer
+        me_res = self.client.get('/api/auth/me', headers={'Authorization': f'Bearer {token}'})
+        self.assertEqual(me_res.status_code, 200)
+        self.assertEqual(me_res.get_json()['user']['email'], unique_email)
+
+        # Limpiar usuario creado usando token admin
+        admin_login = self.client.post('/api/auth/login', json={
+            'email': 'admin@ecocommunity.org',
+            'password': 'EcoCommunity2026*'
+        })
+        self.assertEqual(admin_login.status_code, 200)
+        admin_token = admin_login.get_json()['token']
+        del_res = self.client.delete(f'/api/usuarios/{created_uid}',
+                                     headers={'Authorization': f'Bearer {admin_token}'})
+        self.assertEqual(del_res.status_code, 200)
+        print("  [PASS] Test 9: Registro, Login JWT y /api/auth/me verificados en MySQL.")
+
+    def test_10_authorization_roles_401_403(self):
+        """Verifica rechazo 401 sin token y 403 cuando un ciudadano intenta rutas de admin."""
+        # Sin token -> 401
+        res_401 = self.client.get('/api/usuarios')
+        self.assertEqual(res_401.status_code, 401)
+
+        # Login como ciudadano -> 403 en /api/usuarios y POST /api/materiales
+        cit_login = self.client.post('/api/auth/login', json={
+            'email': 'carlos.mendoza@ecocommunity.org',
+            'password': 'EcoCommunity2026*'
+        })
+        self.assertEqual(cit_login.status_code, 200)
+        cit_token = cit_login.get_json()['token']
+
+        res_403 = self.client.get('/api/usuarios', headers={'Authorization': f'Bearer {cit_token}'})
+        self.assertEqual(res_403.status_code, 403)
+        print("  [PASS] Test 10: Autorización por roles (HTTP 401 sin token y 403 rol ciudadano) validada.")
+
+    def test_11_crud_materiales_mysql(self):
+        """Verifica CRUD completo (Create, Read, Update, Delete) sobre /api/materiales."""
+        admin_token = self.client.post('/api/auth/login', json={
+            'email': 'admin@ecocommunity.org',
+            'password': 'EcoCommunity2026*'
+        }).get_json()['token']
+        headers = {'Authorization': f'Bearer {admin_token}'}
+
+        # Create
+        res_post = self.client.post('/api/materiales', headers=headers, json={
+            'nombre': 'Botella QA Test',
+            'categoria': 'Plástico PET',
+            'puntos_por_kg': 220,
+            'co2_factor': 1.9,
+            'instrucciones_reciclaje': 'Enjuagar y comprimir.'
+        })
+        self.assertEqual(res_post.status_code, 201)
+        mat_id = res_post.get_json()['id_material']
+
+        # Read
+        res_get = self.client.get(f'/api/materiales/{mat_id}')
+        self.assertEqual(res_get.status_code, 200)
+        self.assertEqual(res_get.get_json()['material']['nombre'], 'Botella QA Test')
+
+        # Update
+        res_put = self.client.put(f'/api/materiales/{mat_id}', headers=headers, json={
+            'nombre': 'Botella QA Actualizada',
+            'puntos_por_kg': 250
+        })
+        self.assertEqual(res_put.status_code, 200)
+
+        # Delete
+        res_del = self.client.delete(f'/api/materiales/{mat_id}', headers=headers)
+        self.assertEqual(res_del.status_code, 200)
+        print("  [PASS] Test 11: CRUD completo de Materiales en MySQL verificado.")
+
+    def test_12_crud_puntos_limpios_mysql(self):
+        """Verifica CRUD completo (Create, Read, Update, Delete) sobre /api/puntos."""
+        admin_token = self.client.post('/api/auth/login', json={
+            'email': 'admin@ecocommunity.org',
+            'password': 'EcoCommunity2026*'
+        }).get_json()['token']
+        headers = {'Authorization': f'Bearer {admin_token}'}
+
+        # Create
+        res_post = self.client.post('/api/puntos', headers=headers, json={
+            'nombre': 'Punto QA Temporal',
+            'direccion': 'Calle Pruebas 123',
+            'latitud': 40.4200,
+            'longitud': -3.7000
+        })
+        self.assertEqual(res_post.status_code, 201)
+        punto_id = res_post.get_json()['id_punto']
+
+        # Read
+        res_get = self.client.get(f'/api/puntos/{punto_id}')
+        self.assertEqual(res_get.status_code, 200)
+
+        # Update
+        res_put = self.client.put(f'/api/puntos/{punto_id}', headers=headers, json={
+            'nombre': 'Punto QA Actualizado',
+            'capacidad_actual_kg': 120.5
+        })
+        self.assertEqual(res_put.status_code, 200)
+
+        # Delete
+        res_del = self.client.delete(f'/api/puntos/{punto_id}', headers=headers)
+        self.assertEqual(res_del.status_code, 200)
+        print("  [PASS] Test 12: CRUD completo de Puntos Limpios en MySQL verificado.")
+
+    def test_13_openapi_and_swagger_docs(self):
+        """Verifica que la documentación OpenAPI 3.0 y Swagger UI estén disponibles."""
+        res_spec = self.client.get('/api/openapi.json')
+        self.assertEqual(res_spec.status_code, 200)
+        spec = res_spec.get_json()
+        self.assertIn('/api/auth/login', spec['paths'])
+        self.assertIn('/api/materiales', spec['paths'])
+
+        res_ui = self.client.get('/api/docs')
+        self.assertEqual(res_ui.status_code, 200)
+        self.assertIn(b'swagger-ui', res_ui.data)
+        print("  [PASS] Test 13: Documentación OpenAPI 3.0 (/api/openapi.json) y Swagger UI (/api/docs) verificadas.\n")
 
 if __name__ == '__main__':
     unittest.main()
