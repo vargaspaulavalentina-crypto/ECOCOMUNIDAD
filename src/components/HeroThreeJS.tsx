@@ -551,7 +551,7 @@ export const HeroThreeJS: React.FC<HeroThreeJSProps> = ({
               onClick={onScanClick}
               className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white text-[#070d09] text-xs sm:text-sm font-semibold tracking-wider uppercase shadow-[0_10px_30px_rgba(255,255,255,0.22)] hover:bg-[#d7eb80] hover:scale-[1.02] active:scale-[0.99] transition-all cursor-pointer"
             >
-              <span>INICIAR SESIÓN Y USAR LA APP</span>
+              <span>ESCANEAR RESIDUO</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </button>
 
