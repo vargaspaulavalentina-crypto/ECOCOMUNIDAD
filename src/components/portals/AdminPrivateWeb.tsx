@@ -12,6 +12,10 @@ import {
   Users,
   Coins,
   Scale,
+  Code2,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
 } from 'lucide-react';
 
 interface AdminPrivateWebProps {
@@ -19,6 +23,8 @@ interface AdminPrivateWebProps {
 }
 
 export const AdminPrivateWeb: React.FC<AdminPrivateWebProps> = ({ currentUser }) => {
+  const [showApiDocs, setShowApiDocs] = useState(false);
+  const [apiPreview, setApiPreview] = useState<string | null>(null);
   const [rates, setRates] = useState({
     pet: 200,
     aluminio: 350,
@@ -277,6 +283,89 @@ export const AdminPrivateWeb: React.FC<AdminPrivateWebProps> = ({ currentUser })
               </button>
             </div>
           </div>
+        </div>
+      </LazySection>
+
+      {/* Sección Oculta / Colapsable de Documentación API REST & Swagger (Solo Admin) */}
+      <LazySection delayMs={150}>
+        <div className="bg-[#ffffff] border border-[#f0f0eb] rounded-[20px] overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setShowApiDocs((prev) => !prev)}
+            className="w-full px-6 sm:px-8 py-5 flex items-center justify-between text-left hover:bg-[#f8f8f6] transition-colors cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-[#333333] text-[#d7eb80] flex items-center justify-center shrink-0">
+                <Code2 className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#6c6c6c] block">
+                  Módulo Técnico Oculto · Solo Administrador ({currentUser.nombre})
+                </span>
+                <h3 className="text-base sm:text-lg font-bold text-[#333333]">
+                  Documentación API REST & Swagger UI Integrado
+                </h3>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-semibold text-[#333333]">
+              <span>{showApiDocs ? 'Ocultar' : 'Desplegar'}</span>
+              {showApiDocs ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </div>
+          </button>
+
+          {showApiDocs && (
+            <div className="border-t border-[#f0f0eb] p-6 sm:p-8 space-y-5 bg-[#090d0a] text-white">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { label: 'GET /api/db/status', url: '/api/db/status' },
+                    { label: 'GET /api/usuarios (JWT)', url: '/api/usuarios' },
+                    { label: 'GET /api/materiales', url: '/api/materiales' },
+                    { label: 'GET /api/puntos', url: '/api/puntos' },
+                  ].map((ep) => (
+                    <button
+                      key={ep.url}
+                      type="button"
+                      onClick={async () => {
+                        const token = localStorage.getItem('ecocommunity_jwt');
+                        const res = await fetch(ep.url, {
+                          headers: token ? { Authorization: `Bearer ${token}` } : {},
+                        });
+                        const data = await res.json();
+                        setApiPreview(JSON.stringify(data, null, 2));
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-[#d7eb80] hover:text-[#090d0a] text-xs font-mono transition-colors cursor-pointer"
+                    >
+                      {ep.label}
+                    </button>
+                  ))}
+                </div>
+                <a
+                  href="/api/docs"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-mono text-[#d7eb80] hover:underline"
+                >
+                  <span>Abrir en pestaña nueva</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
+              {apiPreview && (
+                <pre className="p-4 rounded-xl bg-black/70 border border-emerald-500/30 text-[11px] font-mono text-emerald-300 max-h-56 overflow-auto">
+                  {apiPreview}
+                </pre>
+              )}
+
+              <div className="rounded-2xl overflow-hidden border border-white/15 bg-[#060c08]">
+                <iframe
+                  src="/api/docs"
+                  title="EcoCommunity Swagger UI Admin"
+                  className="w-full h-[640px] border-0"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </LazySection>
     </div>
