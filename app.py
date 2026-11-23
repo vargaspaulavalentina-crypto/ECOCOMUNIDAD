@@ -1508,19 +1508,167 @@ def openapi_spec():
 
 @app.route('/api/docs', methods=['GET'])
 def swagger_ui():
-    """Interfaz visual Swagger UI para explorar y probar los endpoints de EcoCommunity."""
+    """Interfaz visual Swagger UI personalizada con tema EcoCommunity y auto-autorización JWT."""
     return """<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>EcoCommunity API Docs (Swagger)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoCommunity API REST · Documentación Swagger</title>
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+  <style>
+    :root {
+      --bg-dark: #060c08;
+      --bg-card: #0e1812;
+      --border-eco: rgba(74, 222, 128, 0.22);
+      --lime: #d7eb80;
+      --emerald: #22c55e;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 80% 0%, rgba(34, 197, 94, 0.14), transparent 45%), var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    .eco-topbar {
+      max-width: 1220px;
+      margin: 24px auto 0;
+      padding: 20px 28px;
+      background: linear-gradient(135deg, rgba(14, 24, 18, 0.96), rgba(9, 15, 11, 0.96));
+      border: 1px solid var(--border-eco);
+      border-radius: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    }
+    .eco-brand { display: flex; flex-direction: column; gap: 4px; }
+    .eco-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--lime);
+    }
+    .eco-title { margin: 0; font-size: 22px; font-weight: 800; color: #fff; }
+    .eco-sub { margin: 0; font-size: 13px; color: var(--text-muted); }
+    .eco-auth-bar {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 14px;
+      border-radius: 14px;
+    }
+    .eco-auth-bar select {
+      background: #09110c; color: #fff; border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; border-radius: 10px; font-size: 13px; outline: none;
+    }
+    .eco-btn {
+      background: var(--lime); color: #090d0a; border: none;
+      padding: 9px 16px; border-radius: 10px; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+    .eco-btn:hover { transform: translateY(-1px); opacity: 0.95; }
+    .eco-status { font-size: 12px; font-family: monospace; color: #86efac; }
+
+    /* Limpieza visual de Swagger UI en modo oscuro EcoCommunity */
+    .swagger-ui { max-width: 1220px; margin: 16px auto 60px; padding: 0 12px; color: var(--text-main); }
+    .swagger-ui .topbar, .swagger-ui .info { display: none; }
+    .swagger-ui .scheme-container {
+      background: var(--bg-card); border: 1px solid var(--border-eco);
+      border-radius: 14px; box-shadow: none; padding: 14px 20px; margin-bottom: 18px;
+    }
+    .swagger-ui .opblock-tag {
+      color: #fff !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+      font-size: 17px !important; padding: 12px 4px !important;
+    }
+    .swagger-ui .opblock-tag small { color: var(--text-muted) !important; }
+    .swagger-ui .opblock {
+      border-radius: 12px !important; border-width: 1px !important;
+      background: rgba(14, 24, 18, 0.85) !important; margin-bottom: 10px !important;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25) !important;
+    }
+    .swagger-ui .opblock .opblock-summary-path,
+    .swagger-ui .opblock .opblock-summary-description { color: #e5e7eb !important; }
+    .swagger-ui .opblock-body, .swagger-ui .opblock-section-header {
+      background: #0a130e !important; color: #e5e7eb !important;
+    }
+    .swagger-ui table thead tr th, .swagger-ui table tbody tr td,
+    .swagger-ui .parameter__name, .swagger-ui .parameter__type,
+    .swagger-ui .response-col_status, .swagger-ui .response-col_description {
+      color: #e5e7eb !important;
+    }
+    .swagger-ui .btn.authorize {
+      color: var(--lime) !important; border-color: var(--lime) !important; border-radius: 10px !important;
+    }
+    .swagger-ui .btn.authorize svg { fill: var(--lime) !important; }
+    .swagger-ui .dialog-ux .modal-ux {
+      background: #0e1812 !important; border: 1px solid var(--border-eco) !important;
+      border-radius: 16px !important; color: #fff !important;
+    }
+    .swagger-ui .dialog-ux .modal-ux-header h3,
+    .swagger-ui .dialog-ux .modal-ux-content h4,
+    .swagger-ui .dialog-ux .modal-ux-content label,
+    .swagger-ui .dialog-ux .modal-ux-content p { color: #fff !important; }
+    .swagger-ui input[type=text], .swagger-ui textarea {
+      background: #060c08 !important; color: #fff !important;
+      border: 1px solid rgba(255,255,255,0.22) !important; border-radius: 8px !important;
+    }
+  </style>
 </head>
 <body>
+  <header class="eco-topbar">
+    <div class="eco-brand">
+      <span class="eco-badge">● PYTHON / FLASK / MYSQL (XAMPP) · OPENAPI 3.0</span>
+      <h1 class="eco-title">EcoCommunity API REST</h1>
+      <p class="eco-sub">Clave demo de usuarios semilla: <strong style="color:#d7eb80">EcoCommunity2026*</strong></p>
+    </div>
+    <div class="eco-auth-bar">
+      <select id="demo-role">
+        <option value="admin@ecocommunity.org">Admin (admin@ecocommunity.org)</option>
+        <option value="carlos.mendoza@ecocommunity.org">Ciudadano (carlos.mendoza@...)</option>
+        <option value="hernan.recolector@rutalimpia.co">Recolector (hernan.recolector@...)</option>
+        <option value="beatriz.acopio@centroverde.org">Centro Acopio (beatriz.acopio@...)</option>
+      </select>
+      <button class="eco-btn" onclick="autoAuthorizeSwagger()">🔑 Autorizar Swagger (JWT)</button>
+      <span id="auth-status" class="eco-status"></span>
+    </div>
+  </header>
+
   <div id="swagger-ui"></div>
+
   <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
   <script>
-    SwaggerUIBundle({ url: '/api/openapi.json', dom_id: '#swagger-ui' });
+    const ui = SwaggerUIBundle({
+      url: '/api/openapi.json',
+      dom_id: '#swagger-ui',
+      persistAuthorization: true,
+    });
+
+    async function autoAuthorizeSwagger() {
+      const email = document.getElementById('demo-role').value;
+      const statusEl = document.getElementById('auth-status');
+      statusEl.textContent = 'Autenticando...';
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: 'EcoCommunity2026*' })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          statusEl.textContent = 'Error: ' + (data.error || res.status);
+          return;
+        }
+        ui.preauthorizeApiKey('BearerAuth', data.token);
+        statusEl.textContent = '✓ Autorizado (' + data.user.rol + ')';
+      } catch (err) {
+        statusEl.textContent = 'Error de conexión';
+      }
+    }
   </script>
 </body>
 </html>"""
