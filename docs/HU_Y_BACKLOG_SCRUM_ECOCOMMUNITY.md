@@ -91,3 +91,4 @@ SENA – Centro de la Industria, la Empresa y los Servicios
 | **Semana 2 — Sprint 2 (BD MySQL + Liquibase + Backend Base)** | Configurar MySQL en XAMPP (`ecocommunity_db`), changelogs Liquibase y endpoints de `usuarios`, `materiales` y `puntos_limpios` en Python/Flask. | Base de datos de 8 tablas operativa y geolocalización Haversine. |
 | **Semana 3 — Sprint 3 (IA Gemini + Entregas + Histórico BD)** | Implementar clasificación orientativa por imágenes con IA, validación de entregas QR/Geofencing y modal interactivo de Histórico BD. | Escáner IA, motor antifraude y trazabilidad de cadena de custodia en MySQL. |
 | **Semana 4 — Sprint 4 (Billetera, ESG, Hero 3D y QA)** | Integrar Billetera Ecocoins, reportes ESG, escena 3D en Three.js y suite de pruebas unitarias Python/MySQL (`8/8 OK`). | Sistema completo desplegado y sincronizado en GitHub (`dev`, `qa`, `main`). |
+

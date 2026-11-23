@@ -61,3 +61,4 @@ SENA – Centro de la Industria, la Empresa y los Servicios
 ### 2.4. Vista 4 — Módulo de Entregas e Histórico Interactivo en MySQL (`HistoricoModal.tsx`)
 - **Objetivo:** Visualizar e interactuar en vivo con los registros almacenados en la base de datos `ecocommunity_db` (XAMPP).
 - **Elementos UI:** Cabecera con estado de conexión `MySQL / MariaDB en XAMPP`, contadores de las 8 tablas, barra de búsqueda y filtros por categoría/custodia, lista maestra de entregas y panel de detalle con botones para avanzar la **Cadena de Custodia** (`depositado` $\rightarrow$ `recolectado` $\rightarrow$ `en_acopio` $\rightarrow$ `transformado`) y abrir el **Recibo Digital Criptográfico**.
+

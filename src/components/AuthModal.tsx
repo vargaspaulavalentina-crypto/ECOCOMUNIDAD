@@ -19,53 +19,53 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [name, setName] = useState('');
   const [selectedRole, setSelectedRole] = useState<UserRole>('ciudadano');
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleQuickPresetLogin = (role: UserRole) => {
-    const roleProfiles: Record<UserRole, UserProfile> = {
-      ciudadano: {
-        id: 1,
-        nombre: 'Valen Vargas',
-        email: 'valen.ciudadana@ecocommunity.org',
-        rol: 'ciudadano',
-        entidad: 'Vecindario Centro',
-      },
-      recolector: {
-        id: 2,
-        nombre: 'Carlos Gestor',
-        email: 'carlos.recolector@ecocommunity.org',
-        rol: 'recolector',
-        entidad: 'Cooperativa Recicladores Urbanos',
-      },
-      punto_acopio: {
-        id: 3,
-        nombre: 'Ing. Elena Morales',
-        email: 'elena.acopio@ecocommunity.org',
-        rol: 'punto_acopio',
-        entidad: 'Centro de Acopio & Molienda Sur',
-      },
-      marca_aliada: {
-        id: 4,
-        nombre: 'Dirección Sostenibilidad GreenRoast',
-        email: 'esg@greenroast.com',
-        rol: 'marca_aliada',
-        entidad: 'GreenRoast Coffee International',
-      },
-      admin: {
-        id: 5,
-        nombre: 'Admin Municipal',
-        email: 'superadmin@ecocommunity.gov',
-        rol: 'admin',
-        entidad: 'Consorcio Gestión Ambiental Municipal',
-      },
+  const handleQuickPresetLogin = async (role: UserRole) => {
+    setError(null);
+    setLoading(true);
+    const demoEmails: Record<UserRole, string> = {
+      ciudadano: 'carlos.mendoza@ecocommunity.org',
+      recolector: 'hernan.recolector@rutalimpia.co',
+      punto_acopio: 'beatriz.acopio@centroverde.org',
+      marca_aliada: 'laura.aliados@greenroast.com',
+      admin: 'admin@ecocommunity.org',
     };
 
-    onLoginSuccess(roleProfiles[role]);
-    onClose();
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: demoEmails[role],
+          password: 'EcoCommunity2026*',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Error iniciando sesión en el servidor.');
+        return;
+      }
+      localStorage.setItem('ecocommunity_jwt', data.token);
+      onLoginSuccess({
+        id: data.user.id_usuario,
+        nombre: data.user.nombre,
+        email: data.user.email,
+        rol: data.user.rol,
+        entidad: data.user.entidad || 'Comunidad EcoCommunity',
+        avatar_url: data.user.avatar_url,
+      });
+      onClose();
+    } catch {
+      setError('No se pudo conectar con el servidor Python/Flask.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -79,16 +79,49 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    const user: UserProfile = {
-      id: Math.floor(100 + Math.random() * 900),
-      nombre: tab === 'register' ? name : email.split('@')[0],
-      email: email.trim(),
-      rol: selectedRole,
-      entidad: selectedRole === 'ciudadano' ? 'Reciclador Ciudadano' : 'Organización Registrada',
-    };
+    setLoading(true);
+    try {
+      const endpoint = tab === 'register' ? '/api/auth/register' : '/api/auth/login';
+      const bodyPayload =
+        tab === 'register'
+          ? {
+              nombre: name.trim(),
+              email: email.trim(),
+              password,
+              rol: selectedRole,
+              entidad: selectedRole === 'ciudadano' ? 'Reciclador Ciudadano' : 'Organización Registrada',
+            }
+          : {
+              email: email.trim(),
+              password,
+            };
 
-    onLoginSuccess(user);
-    onClose();
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyPayload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Error de autenticación.');
+        return;
+      }
+
+      localStorage.setItem('ecocommunity_jwt', data.token);
+      onLoginSuccess({
+        id: data.user.id_usuario,
+        nombre: data.user.nombre,
+        email: data.user.email,
+        rol: data.user.rol,
+        entidad: data.user.entidad || 'Comunidad EcoCommunity',
+        avatar_url: data.user.avatar_url,
+      });
+      onClose();
+    } catch {
+      setError('No se pudo conectar con el servidor Python/Flask.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const rolesCatalog: { id: UserRole; label: string; desc: string; icon: React.ComponentType<{ className?: string }> }[] = [

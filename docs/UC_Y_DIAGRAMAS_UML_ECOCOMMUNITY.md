@@ -243,3 +243,4 @@ classDiagram
     PuntoLimpio "1" --> "0..*" Entrega : acopia
     Material "1" ..> "0..*" Entrega : tipifica
 ```
+
