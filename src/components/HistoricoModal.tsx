@@ -220,16 +220,25 @@ export const HistoricoModal: React.FC<HistoricoModalProps> = ({
 
         {/* Search & Filter Toolbar */}
         <div className="p-4 sm:p-6 border-b border-[#f0f0eb] flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6c6c6c]" />
-            <input
-              type="text"
-              placeholder="Buscar por material, código hash o UUID..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && loadHistory()}
-              className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-[#bebeb9]/40 bg-[#f8f8f6] focus:bg-[#ffffff] focus:outline-none focus:ring-2 focus:ring-[#d7eb80]"
-            />
+          <div className="relative flex-1 flex gap-2">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6c6c6c]" />
+              <input
+                type="text"
+                placeholder="Buscar por material, código hash o UUID..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && loadHistory()}
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-[#bebeb9]/40 bg-[#f8f8f6] focus:bg-[#ffffff] focus:outline-none focus:ring-2 focus:ring-[#d7eb80]"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={loadHistory}
+              className="px-4 py-2 rounded-xl bg-[#333333] hover:bg-[#1f1f1f] text-[#d7eb80] text-xs font-semibold transition-colors shrink-0 cursor-pointer"
+            >
+              Buscar
+            </button>
           </div>
 
           <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">

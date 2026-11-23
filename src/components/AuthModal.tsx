@@ -206,11 +206,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
           {/* Quick Preset Buttons for Instant Testing */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#6c6c6c]">
                 ACCESO RÁPIDO PARA PRUEBAS (1-CLIC):
               </span>
-              <span className="text-[11px] text-[#2d8c3a] font-semibold">5 Webs Privadas</span>
+              <span className="text-[11px] text-[#2d8c3a] font-semibold">
+                {loading ? 'Conectando...' : 'Clave demo: EcoCommunity2026*'}
+              </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <button
